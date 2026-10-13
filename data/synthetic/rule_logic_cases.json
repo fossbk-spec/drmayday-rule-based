@@ -4897,7 +4897,12 @@
         "khac_ket_qua": "(−)"
       },
       "expected_engine": {
-        "exception": "TypeError"
+        "status": "NEEDS_REVIEW",
+        "matched_rule_id": null,
+        "rule_results": {
+          "R-SOC": null
+        },
+        "predicted_label": null
       },
       "workflow_gap": "F-12"
     },
@@ -12089,12 +12094,12 @@
         "khac_ket_qua": "(−)"
       },
       "expected_engine": {
-        "status": "CLASSIFIED",
-        "matched_rule_id": "R-SOC",
-        "predicted_label": "Sốc phản vệ",
+        "status": "NEEDS_REVIEW",
+        "matched_rule_id": null,
         "rule_results": {
-          "R-SOC": true
-        }
+          "R-SOC": null
+        },
+        "predicted_label": null
       },
       "workflow_gap": "F-12"
     },
@@ -12184,12 +12189,12 @@
         "khac_ket_qua": "(−)"
       },
       "expected_engine": {
-        "status": "CLASSIFIED",
-        "matched_rule_id": "R-SOC",
-        "predicted_label": "Sốc phản vệ",
+        "status": "NEEDS_REVIEW",
+        "matched_rule_id": null,
         "rule_results": {
-          "R-SOC": true
-        }
+          "R-SOC": null
+        },
+        "predicted_label": null
       },
       "workflow_gap": "F-12"
     },
@@ -12279,7 +12284,12 @@
         "khac_ket_qua": "(−)"
       },
       "expected_engine": {
-        "exception": "TypeError"
+        "status": "NEEDS_REVIEW",
+        "matched_rule_id": null,
+        "rule_results": {
+          "R-SOC": null
+        },
+        "predicted_label": null
       },
       "workflow_gap": "F-12"
     },
@@ -12369,7 +12379,12 @@
         "khac_ket_qua": "(−)"
       },
       "expected_engine": {
-        "exception": "TypeError"
+        "status": "NEEDS_REVIEW",
+        "matched_rule_id": null,
+        "rule_results": {
+          "R-SOC": null
+        },
+        "predicted_label": null
       },
       "workflow_gap": "F-12"
     },

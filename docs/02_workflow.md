@@ -2,7 +2,62 @@
 
 **Trạng thái:** đặc tả quy trình đề xuất, ngày 09/10/2026; chưa phải pipeline đã triển khai. Tài liệu chuẩn hóa bản tóm tắt của người dùng và các phát hiện trong [explore_codebase.md](explore_codebase.md), đối chiếu [đặc tả luật](01_rules.md), `schema/`, từ điển dữ liệu và source tại commit `34a1ad1`.
 
+> **Cập nhật 13/10/2026 (commit `f9ee49b`):** Pipeline đích, workflow quản lý gói luật và kế hoạch MVP hiện nằm trong [gói hướng dẫn triển khai](implementation-guide/README.md), chủ yếu ở [04 — Workflow và pipeline](implementation-guide/04-workflows-and-pipeline.md). Mục 0 tóm tắt thay đổi; mục 1–13 giữ đặc tả cũ để truy vết. Các link `explore_codebase.md`, `superpowers/plans/...`, `.archify/` và thư mục `tests/` được nhắc trong tài liệu này **không có trong Git** tại commit trên.
+
 Mục tiêu là dữ liệu có hợp đồng rõ ràng, suy diễn đúng phụ thuộc và thứ tự ưu tiên, kết quả tái lập được. AI hỗ trợ đọc tài liệu, đề xuất và kiểm tra; người phụ trách dữ liệu/chuyên môn chốt ý nghĩa biến, mapping và tiêu chí nghiệp vụ. Khi chạy một bộ luật đã chốt, không cần AI tự diễn giải lại từng bệnh án.
+
+## 0. Pipeline đích và thay đổi so với đặc tả 09/10
+
+| Nội dung | Đặc tả 09/10 (mục 2) | Cập nhật theo gói hướng dẫn |
+| --- | --- | --- |
+| Phạm vi | Từng bệnh án, dữ liệu giả | Thêm demo public (ca giả) và import dữ liệu thật có auth/quyền, chạy theo batch/run |
+| Pin phiên bản | Gắn version cho schema/mapping/luật | Resolve và **pin toàn bộ** package/schema/mapping/preprocess/build ngay lúc tiếp nhận, trước RAW validation; batch cố định version từ đầu đến cuối |
+| Tiếp nhận | Tách nhãn thật | Tạo `import_id`/`record_id`; tách dữ kiện, định danh và ground truth thành ba luồng |
+| Kiểm tra | RAW → preprocess → re-check CANONICAL | Giữ; sai contract → `INVALID_DATA`, mapping/cohort chưa chốt → `NEEDS_REVIEW`, sửa dữ liệu có nguồn rồi quay lại RAW |
+| Bảo mật | Áp chính sách khi xuất/nghiên cứu | Áp identity/privacy policy trước engine, re-check bản dùng và lưu snapshot theo version đã pin |
+| Đầu ra | Result + audit | Result envelope có `run_id`, `record_id`, `input_revision`, classifier/package version + hash; audit không chứa PII |
+| Thay đổi luật | Chưa mô tả | Draft → validate → nghiệm thu/so sánh → bác sĩ duyệt → phát hành gói bất biến → kích hoạt → theo dõi/rollback ([05](implementation-guide/05-rule-versioning-and-change-management.md)) |
+| AI | Không | Adapter chạy song song sau MVP, dùng cùng contract CANONICAL/result; không cần cho MVP |
+
+```mermaid
+flowchart TD
+    DEMO["Demo public: ca giả"] --> RECEIVE["Nhận dữ liệu, tạo import_id"]
+    REAL["Dữ liệu thật: auth + quyền"] --> RECEIVE
+    RECEIVE --> PIN["Pin gói/schema/mapping/preprocess/build"]
+    PIN --> SPLIT["Tách dữ kiện, định danh, ground truth"]
+    SPLIT --> GT["Nhãn thật riêng cho evaluator"]
+    SPLIT --> RAW["Validate RAW"]
+    RAW -->|Sai| INVALID["INVALID_DATA"]
+    RAW --> MAP["Mapping + preprocessing có provenance"]
+    MAP --> CAN["Re-check CANONICAL"]
+    CAN -->|Sai contract| INVALID
+    CAN -->|Chưa chốt mapping/cohort| REVIEW["NEEDS_REVIEW"]
+    CAN --> POLICY["Identity/privacy policy + snapshot"]
+    POLICY --> ENGINE["Rule-based engine"]
+    ENGINE --> RESULT["Result + explanation + version"]
+    RESULT --> VIEW["Trực quan hóa + export theo quyền"]
+    RESULT --> COMP["Evaluation"]
+    GT --> COMP
+    RESULT --> AUDIT["Audit không PII"]
+    INVALID --> FIX["Sửa dữ liệu có nguồn"]
+    REVIEW --> FIX
+    FIX --> RAW
+```
+
+**Hiện trạng tại `f9ee49b`:** chỉ đoạn `ca giả/JSON → engine → result → Streamlit` đang chạy. `validate.py`, `pipeline.py`, `evaluate.py`, `validation_rules.yaml` trống; `preprocess.py` và `anonymize.py` có code nhưng chưa nối và còn lỗi.
+
+**Lỗi chặn pipeline** — trạng thái cập nhật 13/10 ([chi tiết](implementation-guide/01-current-state-and-findings.md)):
+
+| ID | Ưu tiên | Lỗi | ID cũ | Trạng thái |
+| --- | --- | --- | --- | --- |
+| TECH-01 | P1 | `<_formula` không kiểm tra kiểu HATT: list/object gây TypeError, bool trả sốc | F-12 | Đã sửa 13/10 |
+| TECH-02 | P1 | `preprocess.py` điền tuổi 25, HATT 120 khi thiếu và ghi đè tuổi có sẵn | — | Đã sửa 13/10 |
+| DATA-01 | P1 | Nhánh cấp thường không khả đạt do shape triệu chứng không thống nhất | F-01 | Mở, chờ chốt shape |
+| SEC-01 | P1 | `anonymize.py` giữ `ma_benh_nhan` gốc; record thiếu ID cùng nhận token từ `UNKNOWN` | — | Đã sửa 13/10 (allowlist export còn mở) |
+| TECH-03 | P2 | `missing_fields` báo sai operand thực sự thiếu trong công thức HATT | liên quan F-13 | Đã sửa 13/10 (phần công thức; F-13 còn mở) |
+| QA-01 | P2 | Thư mục `tests/` không có trong Git dù tài liệu nêu 43 test | — | Đã thêm tests/, chưa có CI |
+
+Thứ tự triển khai: Đợt 1 sửa lõi/hợp đồng dữ liệu → Đợt 2 pipeline/batch/registry → Đợt 3 website MVP → Đợt 4 pilot ([kế hoạch](implementation-guide/06-mvp-implementation-plan.md)). Ngưỡng y khoa, mapping và cohort vẫn chờ bác sĩ chốt ([quyết định mở](implementation-guide/09-decisions-and-templates.md)).
 
 ## 1. Hai phần công việc phải tách biệt
 
@@ -251,7 +306,7 @@ Người dùng chọn **lõi kỹ thuật trước, pipeline sau**. [Rà soát m
 
 Lõi kỹ thuật trên đã được triển khai trong `src/classify.py`, với dependency ở `requirements.txt` và kiểm thử tại `tests/test_classify.py`. Bản luật là `1.2.1`; thay đổi metadata không sửa điều kiện/ngưỡng lâm sàng. Hoàn thành lõi không làm các khoảng tuổi, mapping, điều kiện nghiên cứu hoặc kết quả 53 ca trở nên đã được duyệt.
 
-## 11. Đối chiếu bằng bệnh án giả định — 10/10/2026
+## 12. Đối chiếu bằng bệnh án giả định — 10/10/2026
 
 [Báo cáo chi tiết](06_rule_logic_review.md) và [kết quả từng ca](../data/synthetic/rule_logic_results.json) kiểm tra YAML/source hiện tại, giữ nguyên điều kiện bệnh. Bộ mới có 138 ca: 94 CLASSIFIED, 18 INSUFFICIENT_DATA, 6 NEEDS_REVIEW, 17 UNRESOLVED và 3 TypeError. Có 11 nhãn bệnh xuất hiện, 17/18 rule đích khớp; `R01-CAP-THUONG` chưa khả đạt với kiểu JSON hiện tại. 33 test methods gồm 31 đạt và 2 `expectedFailure` cho lỗi công thức; không gọi bộ kiểm thử là hoàn toàn đạt.
 
@@ -268,7 +323,7 @@ Workflow đủ mô tả các tầng và các bước xử lý, nhưng còn thi�
 
 Replay trực tiếp 53 fixture cũ không mapping trả 34 INSUFFICIENT_DATA và 19 NEEDS_REVIEW, chưa phải đánh giá sau pipeline. Không dùng nhãn thật để làm đầy input. Kỳ vọng `expected_engine` chỉ ghi hành vi hiện tại; kỳ vọng workflow được nghiệm thu sau khi các quyết định B-01–B-06 được xác nhận. Với bộ mới chỉ dùng dữ liệu giả không định danh, B-07 về dữ liệu thật/export được giữ cho giai đoạn tương ứng.
 
-## 12. Demo Streamlit — phạm vi triển khai
+## 13. Demo Streamlit — phạm vi triển khai
 
 `main.py` tại root minh họa engine hiện tại bằng bộ 138 ca, hoặc JSON CANONICAL do người dùng sửa. Dữ liệu `du_lieu` được tách khỏi metadata/kỳ vọng trước suy diễn. Giao diện trình bày hai pha tính phụ thuộc/chọn kết luận, sáu tầng, kết quả từng rule, rule khớp/chặn, điều kiện YAML và trace; danh mục gồm 12 nhãn bệnh và 2 nhãn theo dõi. Ba SVG Archify được dùng lại để đối chiếu, không giả lập rằng những bước chưa có code đã chạy.
 

@@ -121,6 +121,8 @@ Ngoài ra, số lượng bệnh án ở một số lớp còn nhỏ, đặc bi�
 
 Số liệu 53 ca ở trên là kết quả lịch sử, chưa được chạy lại theo hợp đồng lõi mới. Engine nhận một dictionary CANONICAL; mapping hồ sơ legacy, validation/schema, preprocessing, anonymization, batch và evaluator chưa được nối vào pipeline.
 
+Pipeline đích, quy trình quản lý phiên bản luật và kế hoạch MVP bốn đợt nằm trong [gói hướng dẫn triển khai](docs/implementation-guide/README.md); tóm tắt ở [workflow mục 0](docs/02_workflow.md#0-pipeline-đích-và-thay-đổi-so-với-đặc-tả-0910). Chỉ dẫn cho agent ở [CLAUDE.md](CLAUDE.md). Ngày 13/10/2026 đã sửa TECH-01 (F-12), TECH-02, TECH-03 và SEC-01; xem [changelog](docs/05_changelog.md).
+
 ```sh
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
@@ -151,7 +153,7 @@ Mở địa chỉ localhost mà Streamlit in ra. [Streamlit 1.50.0](https://pypi
 
 Input demo là object CANONICAL hoặc envelope `{"du_lieu": {...}}`; metadata/nhãn thật không được truyền vào suy diễn. Demo không tự mapping RAW hoặc điền trường thiếu. Đổi input sẽ xóa kết quả cũ, cần bấm phân loại lại. Các bước validator/preprocessing/batch chưa triển khai được ghi rõ; diagram thể hiện workflow đề xuất, còn kết quả từng rule lấy trực tiếp từ engine.
 
-Nhánh cấp thường chưa khả đạt (F-01), lỗi công thức HATT (F-12) và các lệch còn mở được hiển thị khi review ca giả định. Demo bắt lỗi thực thi để tiếp tục sử dụng giao diện, không sửa kết quả bệnh hoặc giả lập một pipeline đã hoàn thiện. Xem [báo cáo logic](docs/06_rule_logic_review.md) trước khi diễn giải đầu ra.
+Nhánh cấp thường chưa khả đạt (F-01) và các lệch còn mở được hiển thị khi review ca giả định. Demo bắt lỗi thực thi để tiếp tục sử dụng giao diện, không sửa kết quả bệnh hoặc giả lập một pipeline đã hoàn thiện. Xem [báo cáo logic](docs/06_rule_logic_review.md) trước khi diễn giải đầu ra.
 
-Kiểm tra sau khi cài dependency trong `.venv`: 43 test methods, 41 đạt và 2 `expectedFailure` cho lỗi engine F-12 còn mở. Mười test giao diện dùng `streamlit.testing.v1.AppTest`, không cần thêm pytest. Thư mục `tests/` được bỏ khỏi `.gitignore` để các test đi cùng source khi commit. Ý nghĩa hiển thị, ca thực hành và ngày/tác giả sửa đổi được ghi trong [changelog và hướng dẫn demo](docs/05_changelog.md).
+Kiểm tra ngày 13/10/2026: `tests/` (trước đó không có trong Git) gồm 21 test methods cho engine, preprocessing và anonymization, tất cả đạt; chưa có test giao diện Streamlit (số 43 test cũ là lịch sử, các file đó không được commit). Ý nghĩa hiển thị, ca thực hành và ngày/tác giả sửa đổi được ghi trong [changelog và hướng dẫn demo](docs/05_changelog.md).
 

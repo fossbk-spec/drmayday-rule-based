@@ -342,21 +342,24 @@ class ClinicalRuleEngine:
                             None if None in comparisons else False
                         )
                 elif op == "<_formula":
+                    # Both operands must be finite non-bool numbers; blame the operand that fails.
+                    if isinstance(actual, bool) or not isinstance(actual, (int, float)):
+                        reason = "INVALID_TYPE"
                     measure_path = "tuoi" if cond["formula"] == "70 + 2 * tuoi" else "huyet_ap_tam_thu_nen"
-                    try:
-                        measure = self._get_nested_field(data, measure_path)
-                    except KeyError:
-                        reason = "MISSING_VALUE"
-                        field_path = measure_path
-                        measure = None
-                    except ValueError:
-                        reason = "INVALID_TYPE"
-                        field_path = measure_path
-                        measure = None
+                    measure = None
                     if reason is None:
-                        reason = self._unknown_reason(measure)
-                    if reason is None and (isinstance(measure, bool) or not isinstance(measure, (int, float))):
-                        reason = "INVALID_TYPE"
+                        try:
+                            measure = self._get_nested_field(data, measure_path)
+                        except KeyError:
+                            reason = "MISSING_VALUE"
+                        except ValueError:
+                            reason = "INVALID_TYPE"
+                        if reason is None:
+                            reason = self._unknown_reason(measure)
+                        if reason is None and (isinstance(measure, bool) or not isinstance(measure, (int, float))):
+                            reason = "INVALID_TYPE"
+                        if reason is not None:
+                            field_path = measure_path
                     if reason is None:
                         try:
                             threshold = 70.0 + 2.0 * measure if measure_path == "tuoi" else 0.7 * measure

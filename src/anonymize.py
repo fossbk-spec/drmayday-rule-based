@@ -24,6 +24,8 @@ class PatientAnonymizer:
         if not name or not isinstance(name, str):
             return "UNKNOWN_PATIENT"
         parts = name.strip().split()
+        if not parts:
+            return "UNKNOWN_PATIENT"
         if len(parts) == 1:
             return parts[0][0] + "***"
         return f"{parts[0][0]}*** {parts[-1]}"
@@ -43,10 +45,12 @@ class PatientAnonymizer:
         Giữ nguyên các chỉ số lâm sàng, cận lâm sàng và chẩn đoán.
         """
         anon_record = record.copy()
-        raw_id = str(anon_record.get("ma_benh_nhan", "UNKNOWN"))
+        raw_id = anon_record.pop("ma_benh_nhan", None)
 
-        # 1. Sinh token ID duy nhất
-        anon_record["patient_token_id"] = f"PT_{self._hash_value(raw_id)}"
+        # 1. Sinh token ID; mã gốc không còn trong bản xuất. Thiếu mã → token None,
+        # không gộp mọi bản ghi thiếu ID thành cùng một bệnh nhân.
+        raw_id = str(raw_id).strip() if raw_id is not None else ""
+        anon_record["patient_token_id"] = f"PT_{self._hash_value(raw_id)}" if raw_id else None
 
         # 2. Xóa hoặc che giấu PII trực tiếp
         if "ho_ten" in anon_record:

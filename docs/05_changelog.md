@@ -16,6 +16,21 @@ Review: <họ tên, ngày, kết luận khi đã xác nhận>
 
 Không sửa ngày hoặc gán tên cho các lần thay đổi không có bằng chứng. Các phần hướng dẫn phía dưới được cập nhật cùng giao diện; kết quả kiểm tra của từng mục nhật ký vẫn giữ theo thời điểm đã chạy.
 
+## Nhật ký — 13/10/2026
+
+- **Ngày ghi nhận:** 2026-10-13 (+07:00).
+- **Người sửa đổi:** Claude Code (AI), theo yêu cầu của người dùng; chưa có người review.
+- **Branch:** `docs/implementation-guide` (local), từ `f9ee49b`.
+- **File và thay đổi:**
+  - `src/classify.py` — TECH-01 (F-12): `<_formula` kiểm tra HATT đo được là số hữu hạn, không phải bool; bool/chuỗi/list/object trả `NEEDS_REVIEW` thay vì kết luận sốc hoặc `TypeError`. TECH-03: trường thiếu ở vế ngưỡng (`huyet_ap_tam_thu_nen`/`tuoi`) được báo đúng trong `missing_fields`.
+  - `src/preprocess.py` — TECH-02: bỏ mặc định tuổi 25, HATT 120 (đo và nền), thời gian khởi phát 0/1 và ngày khám bằng ngày chạy; không ghi đè tuổi hợp lệ có sẵn; ngày khám trước ngày sinh → không tính tuổi. Chính sách khi tuổi mâu thuẫn ngày sinh vẫn chờ chốt.
+  - `src/anonymize.py` — SEC-01: xóa `ma_benh_nhan` khỏi bản xuất; thiếu mã → `patient_token_id = null`, không gộp chung token; tên chỉ có khoảng trắng không crash.
+  - `data/synthetic/rule_logic_cases.json` — 5 ca F-12 (`SOC-INVALID-BOOL-TRUE/FALSE`, `SOC-INVALID-LIST/OBJECT`, `SOC-MISSING-80`) đổi kỳ vọng sang `NEEDS_REVIEW`. `rule_logic_results.json` giữ nguyên làm bản lịch sử ngày 10/10.
+  - `main.py` — bỏ cảnh báo F-12 vì lỗi đã sửa; `tests/` mới; `.gitignore`.
+- **Trước/sau trên 138 ca:** 94 CLASSIFIED / 18 INSUFFICIENT_DATA / 6 NEEDS_REVIEW / 17 UNRESOLVED / 3 TypeError → 92 / 18 / 11 / 17 / 0. Chỉ 6 ca đổi: 5 ca F-12 và `SOC-NEN-MISSING` (missing_fields đúng trường nền).
+- **Kiểm tra:** `python -m unittest discover -s tests -v` (Python 3.14.7, PyYAML 6.0.3): 21 tests, 21 đạt, 0 expectedFailure. Chạy cùng test trên source cũ: 18 fail + 10 error, xác nhận test bắt được lỗi. Chưa chạy demo Streamlit.
+- **Lỗi còn mở:** DATA-01 (F-01), F-02..F-11, F-13, QA-01 (chưa có CI). Không thay đổi YAML hay ngưỡng y khoa.
+
 ## Nhật ký — 10/10/2026, 09:10:41
 
 - **Ngày giờ ghi nhận:** 2026-10-10 09:10:41 +07:00.

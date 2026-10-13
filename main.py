@@ -22,7 +22,7 @@ ISSUE_HELP = {
     "F-09": "Thiếu sàng lọc phản vệ chung có thể chặn CSU dù xét nghiệm đầy đủ; không tự điền Không vào trường thiếu.",
     "F-10": "CIndU được chọn trước CSU khi cùng khớp; điều kiện cohort và biểu diễn đồng mắc chưa chốt.",
     "F-11": "ASST null có thể kích hoạt fallback ngoài CSU; rule UNKNOWN ưu tiên cao vẫn có thể chặn fallback.",
-    "F-12": "Công thức HATT thiếu kiểm tra kiểu: chuỗi/list/object có thể crash; boolean có thể bị kết luận sốc sai.",
+    "F-12": "Đã sửa 13/10/2026 (TECH-01): HATT sai kiểu (bool/chuỗi/list/object) ở công thức giờ trả NEEDS_REVIEW, không crash và không kết luận sốc.",
     "F-13": "Lý do UNKNOWN có thể bị lẫn với lỗi kiểu từ nhánh OR đã đủ bằng chứng, làm sai lý do cần rà soát.",
 }
 STATUS_HELP = {
@@ -150,10 +150,10 @@ def render() -> None:
                     try:
                         st.session_state["result"] = engine.classify_patient(patient)
                     except (TypeError, ValueError, OverflowError, RecursionError) as exc:
-                        # F-12 remains in the engine; the demo must show the failure, not invent a label.
+                        # The demo must show an engine failure, not invent a label.
                         st.session_state["run_error"] = (
-                            f"Engine không hoàn tất ({type(exc).__name__}). Kiểm tra kiểu dữ liệu; "
-                            "lỗi công thức HATT F-12 đã được ghi nhận. Không có kết luận bệnh."
+                            f"Engine không hoàn tất ({type(exc).__name__}). Kiểm tra kiểu dữ liệu. "
+                            "Không có kết luận bệnh."
                         )
             with st.expander("Kỳ vọng của ca gốc — để đối chiếu sau suy diễn"):
                 if input_changed:
@@ -179,8 +179,6 @@ def render() -> None:
                     st.warning(explanation)
                 else:
                     st.info(explanation)
-                if current_patient and isinstance(current_patient.get("huyet_ap_tam_thu_thap_nhat"), bool):
-                    st.error("**F-12 · HATT boolean: nhãn bên dưới không đáng tin cậy.** Engine có thể coi true/false là số khi tính công thức; cần sửa kiểu dữ liệu và chạy lại.")
                 st.subheader(result["predicted_label"] or "Chưa kết luận bệnh")
                 st.write(result["decision_trace"])
                 st.write("**Rule được chọn:**", result["matched_rule_id"] or "Không có")
