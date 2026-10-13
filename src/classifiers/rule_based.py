@@ -18,6 +18,14 @@ class RuleBasedClassifier(Classifier):
         self._package_id = None
         self._package_hash = None
 
+    @property
+    def knowledge_package_id(self) -> Optional[str]:
+        return self._package_id
+
+    @property
+    def knowledge_package_hash(self) -> Optional[str]:
+        return self._package_hash
+
     @classmethod
     def from_package(cls, package_id: str) -> "RuleBasedClassifier":
         package = load_package(package_id)

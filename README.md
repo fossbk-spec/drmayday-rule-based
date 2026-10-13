@@ -132,6 +132,8 @@ Ngoài ra, số lượng bệnh án ở một số lớp còn nhỏ, đặc bi�
 
 ## 6. Lõi hiện tại và cách chạy
 
+Pipeline d? li?u gi? CANONICAL: `python -m src.pipeline --input data/synthetic/rule_logic_cases.json --env demo --out out/pipeline`. L?nh ghi `run_manifest.json`, `results.jsonl`, `summary.md`; th?m `evaluation.json` khi input c? nh?n th?t (c? th? d?ng `--label-map data/synthetic/label_map.yaml`).
+
 [Quy trình phát hành gói kiến thức](docs/knowledge_release.md).
 
 Số liệu 53 ca ở trên là kết quả lịch sử, chưa được chạy lại theo hợp đồng lõi mới. Engine nhận một dictionary CANONICAL; mapping hồ sơ legacy, validation/schema, preprocessing, anonymization, batch và evaluator chưa được nối vào pipeline.
