@@ -12,9 +12,13 @@ from typing import Any, Dict, Optional
 
 
 def _is_number(value: Any) -> bool:
-    """Số hữu hạn, không phải bool."""
-    return (isinstance(value, (int, float)) and not isinstance(value, bool)
-            and math.isfinite(value))
+    """Số hữu hạn biểu diễn được bằng float, không phải bool."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return math.isfinite(float(value))
+    except OverflowError:  # số nguyên JSON quá lớn
+        return False
 
 
 class MedicalPreprocessor:

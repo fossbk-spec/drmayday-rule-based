@@ -16,6 +16,21 @@ Review: <họ tên, ngày, kết luận khi đã xác nhận>
 
 Không sửa ngày hoặc gán tên cho các lần thay đổi không có bằng chứng. Các phần hướng dẫn phía dưới được cập nhật cùng giao diện; kết quả kiểm tra của từng mục nhật ký vẫn giữ theo thời điểm đã chạy.
 
+## Nhật ký — 13/10/2026 (Bước 0 – nền móng)
+
+- **Người sửa đổi:** Claude Code (AI), theo yêu cầu của người dùng; review bởi Codex (read-only) ở commit `da018a8`, chưa có người review.
+- **Nguồn:** các phát hiện kỹ thuật trong review Codex 13/10 và Bước 0 ở [lộ trình tối ưu](07_phuong_an_mo_rong.md#7-lộ-trình-tối-ưu).
+- **File và thay đổi:**
+  - `src/preprocess.py` — số nguyên rất lớn không còn gây `OverflowError` (lỗi do lần sửa TECH-02 trước gây ra); giá trị được giữ nguyên để validator/engine báo lỗi.
+  - `src/classify.py` — phần tử thiếu/sentinel (`null`, `""`, `unknown`, `N/A`) trong danh sách ở `contains`/`contains_any` trả UNKNOWN với lý do, không còn FALSE; `patient_token_id` chỉ được trả lại nếu đúng định dạng token anonymizer (`PT_` + 16 hex), văn bản tự do thành `UNKNOWN`.
+  - `src/anonymize.py` — bỏ salt mặc định trong source; bắt buộc truyền salt hoặc đặt `DRMAYDAY_TOKEN_SALT`.
+  - `tests/` — thêm test hợp đồng output (bộ khóa, golden `tests/golden/engine_outputs.json` cho 138 ca gồm priority/blocking/missing/hash trace), cache không rò giữa bệnh án, engine không import Streamlit, và test cho các sửa trên. 29 test.
+  - `.github/workflows/tests.yml` — CI chạy test trên Python 3.9 và 3.12.
+  - `README.md` — lệnh PowerShell, CI, golden, salt.
+- **Trước/sau trên 138 ca:** không đổi status/nhãn/rule/missing của ca nào; golden được tạo từ trạng thái này.
+- **Kiểm tra:** 29/29 đạt (Python 3.14.7 local). Chạy test mới trên source trước đó: 6 fail + 1 error. Codex sandbox chạy được test sau khi tạo `.venv` từ Python tại `C:\Antigravity\.tools\python314`.
+- **Còn mở:** `extract_min_sbp` khi có cả giá trị sẵn và bảng sinh hiệu (chờ chốt); allowlist trường xuất và PII lồng nhau/ghi chú (D-07); `R-PV-THEODOI` lệch tài liệu (bác sĩ chốt); test giao diện Streamlit.
+
 ## Nhật ký — 13/10/2026
 
 - **Ngày ghi nhận:** 2026-10-13 (+07:00).

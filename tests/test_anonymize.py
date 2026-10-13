@@ -1,4 +1,6 @@
+import os
 import unittest
+from unittest import mock
 
 from src.anonymize import PatientAnonymizer
 
@@ -32,6 +34,13 @@ class AnonymizeTest(unittest.TestCase):
 
     def test_blank_name_does_not_crash(self):
         self.assertEqual(self.anon.anonymize_record({"ho_ten": "   "})["ho_ten"], "UNKNOWN_PATIENT")
+
+    def test_salt_is_required(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            with self.assertRaises(ValueError):
+                PatientAnonymizer()
+        with mock.patch.dict(os.environ, {PatientAnonymizer.SALT_ENV: "env-salt"}, clear=True):
+            self.assertEqual(PatientAnonymizer().salt, "env-salt")
 
     def test_input_not_mutated(self):
         record = {"ma_benh_nhan": "BN001", "ho_ten": "Nguyễn Văn Anh"}

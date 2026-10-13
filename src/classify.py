@@ -5,8 +5,11 @@ Nạp quy tắc từ rules/classification_rules.yaml và đánh giá từng bả
 
 import hashlib
 import math
+import re
 from typing import Any, Dict, List, Optional, Set
 import yaml
+
+TOKEN_PATTERN = re.compile(r"PT_[0-9A-F]{16}")
 
 
 class ClinicalRuleEngine:
@@ -180,6 +183,13 @@ class ClinicalRuleEngine:
         return cur
 
     @staticmethod
+    def _safe_token(value: Any) -> str:
+        """Echo only anonymizer tokens; free text in this field may carry PII."""
+        if isinstance(value, str) and TOKEN_PATTERN.fullmatch(value):
+            return value
+        return "UNKNOWN"
+
+    @staticmethod
     def _unknown_reason(value: Any) -> Optional[str]:
         if value is None:
             return "MISSING_VALUE"
@@ -336,11 +346,15 @@ class ClinicalRuleEngine:
                         reason = "INVALID_TYPE"
                     else:
                         expected_values = [expected] if op == "contains" else expected
-                        comparisons = [self._safe_equal(item, candidate)
+                        # A missing/sentinel element is unknown, not a non-matching value.
+                        comparisons = [None if self._unknown_reason(item) else self._safe_equal(item, candidate)
                                        for item in actual for candidate in expected_values]
                         result = True if True in comparisons else (
                             None if None in comparisons else False
                         )
+                        if result is None:
+                            reasons = [self._unknown_reason(item) for item in actual]
+                            reason = next((value for value in reasons if value), "INVALID_TYPE")
                 elif op == "<_formula":
                     # Both operands must be finite non-bool numbers; blame the operand that fails.
                     if isinstance(actual, bool) or not isinstance(actual, (int, float)):
@@ -443,7 +457,7 @@ class ClinicalRuleEngine:
             priority = 99
 
         return {
-            "patient_token_id": patient_data.get("patient_token_id", "UNKNOWN"),
+            "patient_token_id": self._safe_token(patient_data.get("patient_token_id")),
             "predicted_label": representative["target_label"] if status == "CLASSIFIED" and representative else None,
             "matched_rule_id": representative["rule_id"] if representative else None,
             "priority": priority,

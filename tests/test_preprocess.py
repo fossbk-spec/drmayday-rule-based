@@ -49,6 +49,12 @@ class PreprocessNoDefaultsTest(unittest.TestCase):
         self.assertEqual(self.pre.preprocess_record({"thoi_gian_khoi_phat_pv": 2})["thoi_gian_khoi_phat_gio"], 2.0)
         self.assertEqual(self.pre.preprocess_record({"thoi_gian_khoi_phat_gio": 0})["thoi_gian_khoi_phat_gio"], 0.0)
 
+    def test_huge_integers_do_not_crash(self):
+        out = self.pre.preprocess_record({"tuoi": 10 ** 1000, "huyet_ap_tam_thu_thap_nhat": 10 ** 1000,
+                                          "thoi_gian_khoi_phat_gio": 10 ** 1000})
+        self.assertEqual(out["tuoi"], 10 ** 1000)  # giữ nguyên để validator/engine báo lỗi
+        self.assertEqual(out["thoi_gian_khoi_phat_gio"], 10 ** 1000)
+
     def test_input_not_mutated(self):
         record = {"tuoi": 5, "trieu_chung_da_hien_tai": {"danh_sach_chon": ["Ngứa"]}}
         snapshot = copy.deepcopy(record)

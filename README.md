@@ -142,6 +142,17 @@ python3 -m venv .venv
 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s tests -v
 ```
 
+Windows (PowerShell):
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+$env:PYTHONDONTWRITEBYTECODE = "1"
+.\.venv\Scripts\python.exe -X utf8 -m unittest discover -s tests -v
+```
+
+CI (`.github/workflows/tests.yml`) chạy bộ test trên Python 3.9 và 3.12 mỗi lần push/PR. `tests/golden/engine_outputs.json` khóa toàn bộ output của 138 ca giả (status, nhãn, priority, rule khớp/chặn, trường thiếu, hash trace); khi thay đổi luật/engine có chủ đích, chạy lại với `UPDATE_GOLDEN=1` và review diff của file golden trong PR. `PatientAnonymizer` cần salt bí mật qua tham số hoặc biến môi trường `DRMAYDAY_TOKEN_SALT`.
+
 ```python
 from src.classify import ClinicalRuleEngine
 
@@ -168,5 +179,5 @@ Input demo là object CANONICAL hoặc envelope `{"du_lieu": {...}}`; metadata/n
 
 Nhánh cấp thường chưa khả đạt (F-01) và các lệch còn mở được hiển thị khi review ca giả định. Demo bắt lỗi thực thi để tiếp tục sử dụng giao diện, không sửa kết quả bệnh hoặc giả lập một pipeline đã hoàn thiện. Xem [báo cáo logic](docs/06_rule_logic_review.md) trước khi diễn giải đầu ra.
 
-Kiểm tra ngày 13/10/2026: `tests/` (trước đó không có trong Git) gồm 21 test methods cho engine, preprocessing và anonymization, tất cả đạt; chưa có test giao diện Streamlit (số 43 test cũ là lịch sử, các file đó không được commit). Ý nghĩa hiển thị, ca thực hành và ngày/tác giả sửa đổi được ghi trong [changelog và hướng dẫn demo](docs/05_changelog.md).
+Kiểm tra ngày 13/10/2026: `tests/` (trước đó không có trong Git) gồm 29 test methods cho engine (kể cả hợp đồng output và golden 138 ca), preprocessing và anonymization, tất cả đạt; chưa có test giao diện Streamlit (số 43 test cũ là lịch sử, các file đó không được commit). Ý nghĩa hiển thị, ca thực hành và ngày/tác giả sửa đổi được ghi trong [changelog và hướng dẫn demo](docs/05_changelog.md).
 

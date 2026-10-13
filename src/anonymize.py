@@ -4,12 +4,19 @@ Loại bỏ và mã hóa các trường nhận dạng cá nhân (PII) như Họ 
 """
 
 import hashlib
+import os
 import re
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 
 class PatientAnonymizer:
-    def __init__(self, salt: str = "AGY_MED_SALT_2026"):
+    SALT_ENV = "DRMAYDAY_TOKEN_SALT"
+
+    def __init__(self, salt: Optional[str] = None):
+        # Không dùng salt mặc định trong source: ai đọc code cũng dò được token từ mã dễ đoán.
+        salt = salt if salt is not None else os.environ.get(self.SALT_ENV)
+        if not salt:
+            raise ValueError(f"Cần salt bí mật: truyền salt hoặc đặt biến môi trường {self.SALT_ENV}.")
         self.salt = salt
 
     def _hash_value(self, value: str) -> str:
