@@ -1,19 +1,19 @@
 # Phương án mở rộng workflow và pipeline
 
-**Ngày:** 13/10/2026 · **Trạng thái:** đề xuất, chưa triển khai · **Nền:** commit `6e56f2b`, YAML `1.2.1`.
+**Ngày:** 13/10/2026 · **Trạng thái:** đề xuất, chưa triển khai · **Nền:** commit `6e56f2b`, lộ trình cập nhật tại `f868402`, YAML `1.2.1`.
 
 Tài liệu này chuyển các yêu cầu bổ sung thành phương án cụ thể cho repo hiện tại. Nguyên tắc và hợp đồng chi tiết nằm trong [gói hướng dẫn](implementation-guide/README.md); ở đây chỉ chốt **làm gì, đặt ở đâu, theo thứ tự nào**. Mọi ngưỡng/tiêu chí y khoa vẫn do bác sĩ duyệt (decision log D-01..D-11 trong [09](implementation-guide/09-decisions-and-templates.md)).
 
 ## 1. Yêu cầu → phương án
 
-| # | Yêu cầu | Phương án | Đợt |
+| # | Yêu cầu | Phương án | Bước (mục 7) |
 | --- | --- | --- | --- |
-| R1 | Luật từ bác sĩ thay đổi, cập nhật nhanh và linh hoạt | Giữ DSL YAML; thêm từ điển biến + kiểm tra cấu hình; quy trình thay đổi qua Pull Request có **báo cáo tác động tự động**; sau MVP thêm form chỉnh luật trên web | 1–2, form ở 3+ |
-| R2 | Đánh version luật | **Gói tri thức bất biến** `knowledge/kb-x.y.z/` + manifest + hash; revision từng rule; con trỏ active theo môi trường; mọi kết quả ghi package/engine version | 2 |
-| R3 | Web public: demo dữ liệu giả + import dữ liệu thật, phân loại có giải thích | Một ứng dụng, hai khu: **Demo** (public, chỉ ca giả) và **Dữ liệu thật** (đăng nhập, quyền kiểm tra ở server). URL public ≠ dữ liệu thật public | Demo: 3a · Thật: 3b |
-| R4 | Trực quan hóa input | Thẻ theo nhóm cơ quan (Có/Không/Chưa biết), timeline thời gian/HA kèm ngưỡng, bảng xét nghiệm, bảng chất lượng dữ liệu, RAW cạnh CANONICAL | 3a |
-| R5 | Trực quan hóa kết quả + giải thích | Thẻ trạng thái → nhãn → version → lý do chính → việc cần làm; cây 6 tầng tô màu TRUE/FALSE/UNKNOWN; bằng chứng từng điều kiện; dashboard batch | 3a–3b |
-| R6 | Kết hợp/so sánh model AI | Giao diện classifier chung + result contract chung; AI chạy **shadow** song song, so sánh trên cùng snapshot; không trộn điểm AI với luật | Sau MVP (chuẩn bị contract từ đợt 2) |
+| R1 | Luật từ bác sĩ thay đổi, cập nhật nhanh và linh hoạt | Giữ DSL YAML; thêm từ điển biến + kiểm tra cấu hình; quy trình thay đổi qua Pull Request có **báo cáo tác động tự động**; sau MVP thêm form chỉnh luật trên web | 1–2 (form web sau MVP) |
+| R2 | Đánh version luật | **Gói tri thức bất biến** `knowledge/kb-x.y.z/` + manifest + hash; revision từng rule; con trỏ active theo môi trường; mọi kết quả ghi package/engine version | 1–2 |
+| R3 | Web public: demo dữ liệu giả + import dữ liệu thật, phân loại có giải thích | Một ứng dụng, hai khu: **Demo** (public, chỉ ca giả) và **Dữ liệu thật** (đăng nhập, quyền kiểm tra ở server). URL public ≠ dữ liệu thật public | Demo: 4 · Thật: 5 |
+| R4 | Trực quan hóa input | Thẻ theo nhóm cơ quan (Có/Không/Chưa biết), timeline thời gian/HA kèm ngưỡng, bảng xét nghiệm, bảng chất lượng dữ liệu, RAW cạnh CANONICAL | 4 |
+| R5 | Trực quan hóa kết quả + giải thích | Thẻ trạng thái → nhãn → version → lý do chính → việc cần làm; cây 6 tầng tô màu TRUE/FALSE/UNKNOWN; bằng chứng từng điều kiện; dashboard batch | 4–5 |
+| R6 | Kết hợp/so sánh model AI | Giao diện classifier chung + result contract chung; AI chạy **shadow** song song, so sánh trên cùng snapshot; không trộn điểm AI với luật | Sau MVP (contract từ bước 1) |
 
 ## 2. Workflow cập nhật luật (R1, R2)
 
@@ -143,18 +143,51 @@ flowchart LR
 - **Sau MVP:** (1) chốt nguồn nhãn thật và protocol đánh giá (D-08); (2) adapter AI đọc cùng CANONICAL, không đọc nhãn/tên file; (3) chạy shadow, lưu riêng; (4) bác sĩ review các ca bất đồng; (5) chỉ mở rộng phạm vi khi đánh giá đạt. Kết hợp rule + AI là một classifier mới có version riêng.
 - Không gửi bệnh án thật tới API AI bên ngoài khi chưa có quyết định D-11.
 
-## 7. Lộ trình
+## 7. Lộ trình tối ưu
 
-Không gắn ngày cam kết; mỗi đợt có bản chạy được.
+Project là **nền tảng phân loại có phiên bản** gồm ba phần – quản lý tri thức bác sĩ, pipeline xử lý bệnh án, website trình bày kết quả – với rule-based là bộ phân loại đầu tiên và AI dùng chung đầu vào để so sánh sau này. Lộ trình dưới đây sắp theo **đường găng** để ít làm lại nhất và có sản phẩm dùng được sớm nhất. Không gắn ngày cam kết.
 
-| Đợt | Kết quả bàn giao | Cần chốt trước |
-| --- | --- | --- |
-| **1 – hoàn thiện lõi** (đang làm) | CI GitHub Actions; F-13; test hợp đồng output; test giao diện demo; `fields.yaml` bản đầu | D-02 cho nhánh cấp thường |
-| **2 – version + pipeline** | `knowledge/kb-1.2.1` + manifest + `active.yaml`; báo cáo tác động trong PR; mẫu REQ; `ingest/validate/pipeline/evaluate`; giao diện classifier | D-01 cho import thật; D-10 ai duyệt/release |
-| **3a – web demo public** | Streamlit đa trang: demo + trực quan input/kết quả + trang luật/phiên bản; deploy lên hosting public | D-09 (bước A) |
-| **3b – khu dữ liệu thật** | Đăng nhập OIDC, import → lỗi từng dòng → batch → kết quả → export, không lưu trữ; host được phép | D-07, D-09; gate bảo mật |
-| **4 – pilot** | Nhóm bác sĩ dùng thử, sửa lỗi, diễn tập rollback, release gói luật được duyệt | Duyệt chuyên môn gói luật |
-| **Sau MVP** | Form/editor luật trên web; bước B (API + DB) nếu cần; AI shadow + so sánh | D-08, D-11 |
+### Hiện trạng tại `f868402`
+
+| Phần | Mức hoàn thành |
+| --- | --- |
+| Bộ phân loại rule-based | Chạy được, có trace và version |
+| Quản lý tri thức bác sĩ | ~10%: YAML có `version` + SHA-256 |
+| Pipeline xử lý bệnh án | ~20%: `preprocess.py`, `anonymize.py` đã sửa nhưng chưa nối; `validate/pipeline/evaluate` trống |
+| Website | ~30%: demo Streamlit chạy local |
+| AI dùng chung đầu vào | 0%: chưa có giao diện classifier chung |
+
+### Bốn nguyên tắc
+
+1. **Chốt hợp đồng trước, tính năng sau.** Ba phần và AI cùng phụ thuộc ba hợp đồng: dữ liệu CANONICAL, kết quả phân loại, định danh gói tri thức. Chốt sai hoặc muộn thì phần nào cũng phải làm lại.
+2. **Dùng công cụ sẵn có trước khi xây mới.** Quản lý tri thức qua GitHub: Pull Request = bản nháp, review của bác sĩ = duyệt, tag = phát hành, CI = báo cáo tác động. Website dùng Streamlit đang có. Chưa cần cơ sở dữ liệu cho đến khi dữ liệu thật phải lưu.
+3. **Thời gian bác sĩ là nút thắt, không phải code.** Mở các quyết định D-01, D-02, D-07, D-10 ngay, song song với code; gom vào một buổi review kèm ca nghiệm thu thay vì hỏi lẻ từng câu.
+4. **Một lát cắt chạy từ đầu đến cuối trên dữ liệu giả trước**, rồi mới mở rộng từng phần.
+
+### Các bước
+
+| Bước | Kết quả bàn giao | Phần | Phụ thuộc | Tương ứng kế hoạch MVP |
+| --- | --- | --- | --- | --- |
+| **0. Nền móng** | Codex chạy được test (Python trong thư mục sandbox đọc được); CI GitHub Actions; sửa các lỗi kỹ thuật từ review Codex 13/10; test hợp đồng output | Tất cả | Không | Đợt 1 (M1-02, M1-09) |
+| **1. Ba hợp đồng** | Result envelope v1 (`classifier_id/version`, gói tri thức + hash, `engine_version`, `run_id`); giao diện `Classifier` với rule-based là bản đầu tiên; `rules/fields.yaml` làm hợp đồng CANONICAL v0 lấy từ các path YAML đang dùng và từ điển dữ liệu | Bộ phân loại, chuẩn bị AI | Không (v0 theo dữ liệu hiện có) | Đợt 1 (M1-08 phần kỹ thuật) |
+| **2. Quản lý tri thức tối thiểu** | `knowledge/kb-1.2.1/` + manifest + `active.yaml`; `tools/impact_report.py`; CI đăng báo cáo tác động vào PR; mẫu yêu cầu REQ cho bác sĩ | Tri thức | D-10 (ai duyệt) – có thể chốt sau | Đợt 2 (M2-06, M2-07) |
+| **3. Pipeline mỏng** | CLI batch: ingest JSON → validate theo `fields.yaml` → phân loại → evaluate; run manifest pin version; chạy trên 138 + 53 ca giả, đếm đủ mọi record | Pipeline | Không; mapping RAW sau D-01 | Đợt 2 (M2-02..M2-05, M2-08) |
+| **4. Web demo public** | Streamlit đa trang: Demo, Chi tiết ca (trực quan input + kết quả), Luật & phiên bản (changelog, báo cáo tác động); deploy Streamlit Community Cloud | Website | Không | Đợt 3 (M3-02, M3-05, M3-06) |
+| **5. Khu dữ liệu thật** | Đăng nhập OIDC; import → lỗi từng dòng → batch → export; xử lý trong bộ nhớ trên máy chủ được phép | Website + Pipeline | **D-01, D-07**, gate bảo mật | Đợt 3 (M3-03, M3-04, M3-07) |
+| **6. Pilot** | Bác sĩ dùng thử; phát hành `kb-1.3.0` đã duyệt (gồm F-01 cấp thường) | Tất cả | Duyệt chuyên môn (D-02…) | Đợt 4 |
+| **Sau MVP** | API + DB khi cần lưu lịch sử; editor luật trên web; AI shadow dùng chung CANONICAL và result contract | Mở rộng | D-08, D-09, D-11 | Sau MVP |
+
+Bước 0–4 **không chờ quyết định nào** nên làm liên tục; bước 5–6 chờ bác sĩ và chủ dữ liệu.
+
+**Hợp đồng rút gọn cho bước 5 (không lưu bệnh án):** không lưu RAW/CANONICAL/kết quả có giá trị lâm sàng sau phiên, nhưng vẫn ghi **run manifest** (run_id, người chạy, thời điểm, gói/engine version, số record nhận/chạy/lỗi/từng status, hash file import và file export) và audit không chứa PII. Chạy lại = upload lại tạo run mới; không có record revision, retry theo idempotency key hay xem lại kết quả cũ. Khi cần các chức năng đó thì chuyển sang API + DB (sau MVP) theo [hợp đồng đầy đủ](implementation-guide/03-architecture-and-contracts.md#lưu-trữ-và-vận-hành). Phạm vi rút gọn này cần chủ sản phẩm chấp thuận cùng D-07.
+
+### Chưa làm vì chưa cần
+
+Cơ sở dữ liệu, API riêng, editor kéo thả, registry luật tự xây, microservices, huấn luyện model AI.
+
+### Phân công thực hiện
+
+Codex làm từng task nhỏ theo brief cho bước 0–4; Claude viết brief, review diff và sửa nhỏ trực tiếp; mỗi lúc chỉ một phiên Codex.
 
 ## 8. Quyết định cần bạn/bác sĩ chốt sớm
 
