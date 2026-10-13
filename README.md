@@ -1,3 +1,16 @@
+# DrMayday – nền tảng phân loại bệnh án có phiên bản
+
+Nền tảng phân loại bệnh án có phiên bản, gồm ba phần: **quản lý tri thức bác sĩ**, **pipeline xử lý bệnh án** và **website trình bày kết quả**. Rule-based là bộ phân loại đầu tiên; các model AI sau này dùng chung dữ liệu chuẩn hóa (CANONICAL) để so sánh trên cùng nhãn tham chiếu độc lập.
+
+**Hiện trạng:** đã có engine rule-based (`src/classify.py`, `rules/classification_rules.yaml`) và demo Streamlit chạy local; quản lý phiên bản gói tri thức, pipeline và website đang ở giai đoạn thiết kế. Xem [phương án mở rộng](docs/07_phuong_an_mo_rong.md) và [gói hướng dẫn triển khai](docs/implementation-guide/README.md).
+
+| Phần | Đã có | Đang thiết kế |
+| --- | --- | --- |
+| Quản lý tri thức | YAML có `version` + SHA-256 trong kết quả | Gói tri thức bất biến, duyệt/kích hoạt/rollback, báo cáo tác động |
+| Pipeline | Engine; `preprocess.py`, `anonymize.py` chưa nối | Tiếp nhận → validate → chuẩn hóa → khử định danh → phân loại → audit/đánh giá |
+| Website | Demo Streamlit local với ca giả | Demo public, khu dữ liệu thật có đăng nhập, trực quan input/kết quả |
+| Bộ phân loại | Rule-based | Giao diện classifier chung; AI chạy song song để so sánh (sau MVP) |
+
 ## Kiểm thử hệ thống Rule-Based bằng bệnh án giả lập
 
 ### 1. Tạo bộ dữ liệu bệnh án giả lập
