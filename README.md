@@ -160,7 +160,18 @@ engine = ClinicalRuleEngine("rules/classification_rules.yaml")
 result = engine.classify_patient(canonical_patient_data)
 ```
 
-Kết quả giữ sáu trường public hiện có và bổ sung kết quả từng luật, luật khớp/chặn, trường thiếu, trace không chứa giá trị bệnh án, version và SHA-256 của YAML. Lõi trả `CLASSIFIED`, `INSUFFICIENT_DATA`, `NEEDS_REVIEW` hoặc `UNRESOLVED`; các gate pipeline còn mở được ghi ở `docs/03_implementation_readiness.md`.
+Để pipeline/web/AI dùng chung một hợp đồng, gọi qua giao diện classifier:
+
+```python
+from src.classifiers import RuleBasedClassifier
+
+result = RuleBasedClassifier("rules/classification_rules.yaml").classify(canonical_patient_data, record_id="REC-001")
+# result: result envelope v1 — status, predicted_label, missing_fields, explanation, version gói luật/engine; chi tiết rule trong result["details"]
+```
+
+`rules/fields.yaml` là từ điển CANONICAL v0 cho mọi trường luật đọc (kiểu, đơn vị, giá trị, nhóm hiển thị, rule dùng, `todo` cần chốt). Kiểm tra đồng bộ với YAML luật: `python tools/build_fields.py --check`. Brief: [docs/tasks/B1-contracts.md](docs/tasks/B1-contracts.md).
+
+Kết quả engine giữ sáu trường public hiện có và bổ sung kết quả từng luật, luật khớp/chặn, trường thiếu, trace không chứa giá trị bệnh án, version và SHA-256 của YAML. Lõi trả `CLASSIFIED`, `INSUFFICIENT_DATA`, `NEEDS_REVIEW` hoặc `UNRESOLVED`; các gate pipeline còn mở được ghi ở `docs/03_implementation_readiness.md`.
 
 ## 7. Demo Streamlit
 
