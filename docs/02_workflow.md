@@ -57,7 +57,7 @@ flowchart TD
 | TECH-03 | P2 | `missing_fields` báo sai operand thực sự thiếu trong công thức HATT | liên quan F-13 | Đã sửa 13/10 (phần công thức; F-13 còn mở) |
 | QA-01 | P2 | Thư mục `tests/` không có trong Git dù tài liệu nêu 43 test | — | Đã thêm tests/, chưa có CI |
 
-Thứ tự triển khai: Đợt 1 sửa lõi/hợp đồng dữ liệu → Đợt 2 pipeline/batch/registry → Đợt 3 website MVP → Đợt 4 pilot ([kế hoạch](implementation-guide/06-mvp-implementation-plan.md)). Ngưỡng y khoa, mapping và cohort vẫn chờ bác sĩ chốt ([quyết định mở](implementation-guide/09-decisions-and-templates.md)).
+Thứ tự triển khai: Đợt 1 sửa lõi/hợp đồng dữ liệu → Đợt 2 pipeline/batch/registry → Đợt 3 website MVP → Đợt 4 pilot ([kế hoạch](implementation-guide/06-mvp-implementation-plan.md)). Ngưỡng y khoa, mapping và cohort vẫn chờ bác sĩ chốt ([quyết định mở](implementation-guide/09-decisions-and-templates.md)). Phương án cụ thể cho cập nhật luật, version, website và AI: [07 — Phương án mở rộng](07_phuong_an_mo_rong.md).
 
 ## 1. Hai phần công việc phải tách biệt
 
