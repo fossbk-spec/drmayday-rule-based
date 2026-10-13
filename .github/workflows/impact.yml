@@ -1,0 +1,45 @@
+name: rule impact
+
+on:
+  pull_request:
+    paths:
+      - "rules/**"
+      - "src/**"
+      - "knowledge/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  impact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: head
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned dependencies
+        run: python -m pip install -r head/requirements.txt
+      - name: Report synthetic-case impact
+        run: python head/tools/impact_report.py --base-root base --head-root head --cases head/data/synthetic/rule_logic_cases.json --out report.md
+      - name: Publish summary
+        run: cat report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Update PR comment when permitted
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          comment_id=$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" --paginate --jq '.[] | select(.body | contains("<!-- impact-report -->")) | .id' 2>/dev/null | head -n 1) || true
+          if [ -n "$comment_id" ]; then
+            gh api --method PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${comment_id}" -F body=@report.md || echo "Comment unavailable; summary retained."
+          else
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" -F body=@report.md || echo "Comment unavailable; summary retained."
+          fi

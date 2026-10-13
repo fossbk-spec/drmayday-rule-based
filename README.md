@@ -132,6 +132,8 @@ Ngoài ra, số lượng bệnh án ở một số lớp còn nhỏ, đặc bi�
 
 ## 6. Lõi hiện tại và cách chạy
 
+[Quy trình phát hành gói kiến thức](docs/knowledge_release.md).
+
 Số liệu 53 ca ở trên là kết quả lịch sử, chưa được chạy lại theo hợp đồng lõi mới. Engine nhận một dictionary CANONICAL; mapping hồ sơ legacy, validation/schema, preprocessing, anonymization, batch và evaluator chưa được nối vào pipeline.
 
 Pipeline đích, quy trình quản lý phiên bản luật và kế hoạch MVP bốn đợt nằm trong [gói hướng dẫn triển khai](docs/implementation-guide/README.md); tóm tắt ở [workflow mục 0](docs/02_workflow.md#0-pipeline-đích-và-thay-đổi-so-với-đặc-tả-0910). Chỉ dẫn cho agent ở [CLAUDE.md](CLAUDE.md). Ngày 13/10/2026 đã sửa TECH-01 (F-12), TECH-02, TECH-03 và SEC-01; xem [changelog](docs/05_changelog.md).
