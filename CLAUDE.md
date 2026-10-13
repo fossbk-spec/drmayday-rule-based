@@ -1,5 +1,7 @@
 # Chỉ dẫn thực hiện project rule_based_mayday
 
+> **Tiếp tục công việc:** đọc [docs/HANDOFF.md](docs/HANDOFF.md) trước – tiến độ, việc tiếp theo, quy tắc merge và thiết lập máy mới (cập nhật file đó khi kết thúc mỗi phiên).
+
 ## Nhiệm vụ và nguồn chuẩn
 
 Đọc toàn bộ gói hướng dẫn trước khi lập kế hoạch thay đổi. Các file `01-...md` đến `09-...md` nằm cùng thư mục với file này hoặc dưới `docs/implementation-guide/` sau khi được đưa vào repo. Đọc README của gói để biết mục lục.
