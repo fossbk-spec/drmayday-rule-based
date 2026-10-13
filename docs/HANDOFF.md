@@ -2,6 +2,28 @@
 
 **Cập nhật:** 14/10/2026 · **HEAD:** `main` sau PR #5 · **Repo:** <https://github.com/fossbk-spec/drmayday-rule-based> (bản gốc: `trangdoanthu26/rule_based_mayday`).
 
+## 0. Bắt đầu ngay trên máy mới
+
+**Bước 1 – thiết lập** (PowerShell, cần Git + Python ≥3.9; thêm `-ForCodex` nếu dùng Codex trên máy đó):
+
+```powershell
+git clone git@github.com:fossbk-spec/drmayday-rule-based.git
+cd drmayday-rule-based
+powershell -ExecutionPolicy Bypass -File tools\setup_machine.ps1 -ForCodex
+```
+
+Script tạo `.venv` (với `-ForCodex`: từ bản Python copy vào `..\.tools\` để sandbox Codex đọc được), cài `requirements.txt`, chạy 52 test và kiểm tra gói tri thức/từ điển trường.
+
+**Bước 2 – mở Claude Code trong thư mục repo và dán:**
+
+```text
+Đọc CLAUDE.md và docs/HANDOFF.md. Kiểm tra git log/status so với mục "Tiến độ", chạy test một lần,
+rồi tóm tắt trạng thái và đề xuất việc tiếp theo theo mục "Việc tiếp theo". Làm việc theo
+"Cách làm việc đã thống nhất" (brief → Codex → review → PR → tự merge PR kỹ thuật khi CI xanh;
+luật y khoa, active real, dữ liệu thật, deploy khu dữ liệu thật chờ người dùng/bác sĩ).
+Cuối phiên cập nhật docs/HANDOFF.md và push.
+```
+
 Đọc theo thứ tự: file này → [CLAUDE.md](../CLAUDE.md) → [docs/07 mục 7 – Lộ trình tối ưu](07_phuong_an_mo_rong.md#7-lộ-trình-tối-ưu) → [changelog](05_changelog.md).
 
 ## 1. Tiến độ
