@@ -1,14 +1,20 @@
 # DrMayday – nền tảng phân loại bệnh án có phiên bản
 
+## Triển khai demo
+
+Demo chỉ dùng ca giả trong `data/synthetic/`; không nhập bệnh án thật. Chạy local bằng `pip install -r requirements.txt` rồi `streamlit run main.py` (hoặc `\.venv\Scripts\python.exe -m streamlit run main.py` trên Windows).
+
+Để đưa lên Streamlit Community Cloud: đăng nhập tài khoản Streamlit, chọn **Create app**, kết nối repo `fossbk-spec/drmayday-rule-based`, chọn nhánh `main`, đặt main file là `main.py`, rồi deploy. Kiểm tra trang Demo, Luật & phiên bản, Batch và Giới thiệu sau khi triển khai. Repo hiện dùng gói tri thức active cho môi trường `demo`; cấu hình không nhận upload bệnh án.
+
 Nền tảng phân loại bệnh án có phiên bản, gồm ba phần: **quản lý tri thức bác sĩ**, **pipeline xử lý bệnh án** và **website trình bày kết quả**. Rule-based là bộ phân loại đầu tiên; các model AI sau này dùng chung dữ liệu chuẩn hóa (CANONICAL) để so sánh trên cùng nhãn tham chiếu độc lập.
 
-**Hiện trạng:** đã có engine rule-based (`src/classify.py`, `rules/classification_rules.yaml`) và demo Streamlit chạy local; quản lý phiên bản gói tri thức, pipeline và website đang ở giai đoạn thiết kế. Xem [phương án mở rộng](docs/07_phuong_an_mo_rong.md) và [gói hướng dẫn triển khai](docs/implementation-guide/README.md).
+**Hiện trạng:** đã có engine rule-based, gói tri thức bất biến, pipeline CANONICAL và demo Streamlit dùng ca giả. Luồng dữ liệu thật, đăng nhập và đánh giá lâm sàng chưa triển khai. Xem [phương án mở rộng](docs/07_phuong_an_mo_rong.md) và [gói hướng dẫn triển khai](docs/implementation-guide/README.md).
 
 | Phần | Đã có | Đang thiết kế |
 | --- | --- | --- |
-| Quản lý tri thức | YAML có `version` + SHA-256 trong kết quả | Gói tri thức bất biến, duyệt/kích hoạt/rollback, báo cáo tác động |
-| Pipeline | Engine; `preprocess.py`, `anonymize.py` chưa nối | Tiếp nhận → validate → chuẩn hóa → khử định danh → phân loại → audit/đánh giá |
-| Website | Demo Streamlit local với ca giả | Demo public, khu dữ liệu thật có đăng nhập, trực quan input/kết quả |
+| Quản lý tri thức | Gói bất biến, active pointer, SHA-256, so sánh tác động | Duyệt và rollback có quy trình |
+| Pipeline | Validate CANONICAL, phân loại batch, đánh giá nhãn giả | Tiếp nhận RAW → chuẩn hóa → khử định danh → audit |
+| Website | Demo Streamlit ca giả, trực quan input/kết quả, luật và batch | Khu dữ liệu thật có đăng nhập |
 | Bộ phân loại | Rule-based | Giao diện classifier chung; AI chạy song song để so sánh (sau MVP) |
 
 ## Kiểm thử hệ thống Rule-Based bằng bệnh án giả lập
