@@ -1,0 +1,626 @@
+version: 0.1.0
+missing_conventions:
+  missing: null
+  unknown:
+  - unknown
+  - -1
+  not_applicable: N/A
+fields:
+  anh_san_phu:
+    type: string
+    values:
+    - Có
+    - Không
+    group: da
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R-SANGLOC-CAP
+    todo: ''
+  anh_sang_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    - (+/−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CindU-04
+    todo: ''
+  ap_luc_cham_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    - (+/−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CindU-04
+    todo: ''
+  asst_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    - (+/−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-DEFAULT
+    - R-GD-01
+    - R-GD-02
+    todo: ''
+  cholinergic_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    - (+/−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CindU-02
+    - R-CindU-04
+    todo: ''
+  da_ve_noi_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    - (+/−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CindU-01
+    - R-CindU-04
+    todo: ''
+  dac_diem_san_phu_cap.dang_ton_thuong:
+    type: list
+    values:
+    - Hình vòng
+    - Hình đứt đoạn
+    - Hình bản đồ
+    - Hình tròn
+    - Dát sẩn
+    - Khác (ghi rõ)
+    group: da
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R-SANGLOC-CAP
+    todo: Parent dictionary does not define this nested path directly. Rules add a qualifier to lesion
+      labels absent from dictionary.
+  dau_hieu_nang_chi_tiet:
+    type: list
+    values:
+    - Phù mạch đáng kể
+    - Sẩn phù lan rộng >50% BSA hoặc >50 nốt/24h
+    - Triệu chứng hô hấp nhưng chưa đủ tiêu chuẩn phản vệ
+    - Triệu chứng tiêu hóa nhưng chưa đủ tiêu chuẩn phản vệ
+    group: da
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R01-CAP-NANG
+    todo: ''
+  hien_tai_co_san_phu:
+    type: string
+    values:
+    - Có
+    - Không
+    group: da
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R-SANGLOC-CAP
+    todo: ''
+  hoan_canh_xuat_hien_san_phu:
+    type: object
+    values: []
+    group: da
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CindU-00
+    todo: Dictionary says object; rules compare a direct string or list. Confirm shape.
+  huyet_ap_tam_thu_nen:
+    type: number
+    unit: mmHg
+    values: []
+    group: tuan_hoan
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R-SOC
+    todo: Dictionary leaves the valid range unspecified.
+  huyet_ap_tam_thu_thap_nhat:
+    type: number
+    unit: mmHg
+    values: []
+    group: tuan_hoan
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R-SOC
+    todo: ''
+  ige_khang_il24_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CSU-OVL-01
+    - R-CSU-T1-01
+    - R-CSU-T1-02
+    - R-CSU-T2-01
+    - R-CSU-UNK-01
+    - R-CSU-UNK-02
+    todo: ''
+  ige_toan_phan:
+    type: number
+    unit: UI/mL
+    values: []
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-GD-02
+    todo: cap.md lacks a unit; man.md gives UI/mL.
+  igg_khang_fceria_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CSU-OVL-01
+    - R-CSU-T1-01
+    - R-CSU-T2-01
+    - R-CSU-UNK-01
+    todo: ''
+  igg_khang_ige_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CSU-OVL-01
+    - R-CSU-T1-01
+    - R-CSU-T2-01
+    - R-CSU-UNK-01
+    todo: ''
+  khac_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    - (+/−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CindU-04
+    todo: ''
+  lanh_cucda_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    - (+/−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CindU-03
+    todo: ''
+  lanh_temptest_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    - (+/−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CindU-03
+    - R-CindU-04
+    todo: ''
+  luu_huyet_thanh:
+    type: string
+    values:
+    - Có
+    - Không
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CSU-00
+    todo: ''
+  muc_do_lan_rong_va_phan_bo_ton_thuong.muc_do_lan_rong:
+    type: string
+    values:
+    - '>50% BSA'
+    - ≤50% BSA
+    group: khac
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R01-CAP-NANG
+    - R01-CAP-THUONG
+    todo: Parent dictionary does not define this nested path directly.
+  nuoc_ket_qua:
+    type: string
+    values:
+    - (+)
+    - (−)
+    - (+/−)
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CindU-04
+    todo: ''
+  so_lan_phu_mach_nang_can_vien:
+    type: number
+    unit: lần
+    values: []
+    group: da
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R01-CAP-NANG
+    - R01-CAP-THUONG
+    todo: ''
+  so_luong_san_phu:
+    type: string
+    unit: nốt
+    values:
+    - <20 nốt
+    - 20-50 nốt
+    - '>50 nốt'
+    group: da
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R01-CAP-NANG
+    - R01-CAP-THUONG
+    todo: ''
+  so_ngay_theo_doi:
+    type: number
+    values: []
+    group: thoi_gian
+    form: man
+    source: rules only
+    used_by:
+    - R-CSU-OVL-01
+    - R-CSU-T1-01
+    - R-CSU-T2-01
+    - R-CSU-UNK-01
+    - R-DEFAULT
+    todo: No data-dictionary row; type and values inferred from rules.
+  stella_dat:
+    type: boolean
+    values:
+    - true
+    - false
+    group: xet_nghiem
+    form: man
+    source: rules only
+    used_by:
+    - R-GD-02
+    todo: No data-dictionary row; type and values inferred from rules.
+  tac_nhan_hit_vao_pv:
+    type: string
+    values:
+    - Có
+    - Không
+    group: khac
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R03-PV
+    todo: ''
+  thoi_gian_khoi_phat_gio:
+    type: number
+    unit: giờ
+    values: []
+    group: thoi_gian
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R-SANGLOC-CAP
+    todo: ''
+  thoi_gian_khoi_phat_tuan:
+    type: number
+    unit: tuần
+    values: []
+    group: thoi_gian
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CSU-00
+    - R-CindU-00
+    todo: ''
+  thoi_gian_ngung_corticoid_asst:
+    type: number
+    unit: ngày
+    values: []
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CSU-00
+    todo: ''
+  thoi_gian_ngung_khang_histamine_asst:
+    type: number
+    unit: ngày
+    values: []
+    group: xet_nghiem
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R-CSU-00
+    todo: ''
+  tiep_tuc_theo_doi_chua_du_du_kien:
+    type: boolean
+    values:
+    - true
+    - false
+    group: thoi_gian
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R-PV-THEODOI
+    todo: ''
+  trieu_chung_da_hien_tai:
+    type: object
+    values: []
+    group: da
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R01-CAP-NANG
+    - R01-CAP-THUONG
+    todo: Dictionary says object; rules compare a direct string or list. Confirm shape.
+  trieu_chung_da_hien_tai.danh_sach_chon:
+    type: list
+    values:
+    - Phù mạch
+    - Sẩn phù
+    - Ban dát sẩn
+    - Không có
+    - Khác (ghi rõ)
+    group: da
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R01-CAP-THUONG
+    todo: Parent dictionary does not define this nested path directly.
+  trieu_chung_da_hien_tai_pv.danh_sach_chon:
+    type: list
+    values:
+    - Phù mạch
+    - Sẩn phù
+    - Ban dát sẩn
+    - Không có
+    - Khác
+    group: da
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R01-PV
+    - R02-PV
+    todo: Parent dictionary does not define this nested path directly.
+  trieu_chung_ho_hap_hien_tai.danh_sach_chon:
+    type: list
+    values:
+    - Thở khò khè
+    - Nghẹn họng
+    - Khó thở / thở rít
+    - Đau / tức ngực
+    - Không có
+    - Khác (ghi rõ)
+    group: ho_hap
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R01-CAP-NANG
+    - R01-CAP-THUONG
+    todo: Parent dictionary does not define this nested path directly.
+  trieu_chung_ho_hap_hien_tai_pv.danh_sach_chon:
+    type: list
+    values:
+    - Tiếng rít thanh quản
+    - Khó thở
+    - Thở khò khè
+    - Nghẹn họng
+    - Viêm long đường hô hấp
+    - Khàn giọng
+    - Ngừng thở
+    - Không có
+    - Khác (ghi rõ)
+    group: ho_hap
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R01-PV
+    - R02-PV
+    - R03-PV
+    todo: Parent dictionary does not define this nested path directly.
+  trieu_chung_tieu_hoa_hien_tai.buon_non_tieu_chay:
+    type: boolean
+    values:
+    - true
+    - false
+    group: tieu_hoa
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R01-CAP-NANG
+    - R01-CAP-THUONG
+    todo: Parent dictionary does not define this nested path directly.
+  trieu_chung_tieu_hoa_hien_tai.dau_bung_quan_that:
+    type: boolean
+    values:
+    - true
+    - false
+    group: tieu_hoa
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R01-CAP-NANG
+    - R01-CAP-THUONG
+    todo: Parent dictionary does not define this nested path directly.
+  trieu_chung_tieu_hoa_hien_tai.non:
+    type: boolean
+    values:
+    - true
+    - false
+    group: tieu_hoa
+    form: cap
+    source: docs/01_data_dictionary/cap.md
+    used_by:
+    - R01-CAP-NANG
+    - R01-CAP-THUONG
+    todo: Parent dictionary does not define this nested path directly.
+  trieu_chung_tieu_hoa_hien_tai_pv.dau_bung_quan_that:
+    type: boolean
+    values:
+    - true
+    - false
+    group: tieu_hoa
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R02-PV
+    todo: Parent dictionary does not define this nested path directly.
+  trieu_chung_tieu_hoa_hien_tai_pv.non_so_lan:
+    type: number
+    unit: l?n
+    values: []
+    group: tieu_hoa
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R02-PV
+    todo: Parent dictionary does not define this nested path directly.
+  trieu_chung_tuan_hoan_hien_tai_pv.danh_sach_chon:
+    type: list
+    values:
+    - Ngất
+    - Chóng mặt
+    - Tụt huyết áp / sốc
+    - Tím tái
+    - Không có
+    - Khác (ghi rõ)
+    group: tuan_hoan
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R01-PV
+    - R02-PV
+    - R03-PV
+    todo: Parent dictionary does not define this nested path directly.
+  tuoi:
+    type: number
+    values: []
+    group: hanh_chinh
+    form: chung
+    source: rules only
+    used_by:
+    - R-CSU-00
+    - R-SOC
+    todo: No data-dictionary row; type and values inferred from rules.
+  vi_tri_phu_mach.danh_sach_chon:
+    type: list
+    values:
+    - Một bên
+    - Hai bên
+    - Mi mắt
+    - Lưỡi
+    - Môi
+    - Các phần khác của mặt
+    - Thanh quản
+    - Bàn tay
+    - Bàn chân
+    - Sinh dục
+    - 'Vị trí khác (ghi rõ: ...)'
+    group: da
+    form: man
+    source: docs/01_data_dictionary/man.md
+    used_by:
+    - R01-CAP-NANG
+    - R01-CAP-THUONG
+    todo: Parent dictionary does not define this nested path directly.
+  yeu_to_nghi_ngo_pv_con_trung_dot.co_khong:
+    type: string
+    values:
+    - Có
+    - Không
+    group: khac
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R01-PV
+    - R02-PV
+    - R03-PV
+    todo: Parent dictionary includes a note in the positive label; YAML compares the shorter nested value.
+      Confirm stored enum and shape.
+  yeu_to_nghi_ngo_pv_khac.co_khong:
+    type: string
+    values:
+    - Có
+    - Không
+    group: khac
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R01-PV
+    - R02-PV
+    - R03-PV
+    todo: Parent dictionary includes a note in the positive label; YAML compares the shorter nested value.
+      Confirm stored enum and shape.
+  yeu_to_nghi_ngo_pv_thuc_an.co_khong:
+    type: string
+    values:
+    - Có
+    - Không
+    group: khac
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R01-PV
+    - R02-PV
+    - R03-PV
+    todo: Parent dictionary includes a note in the positive label; YAML compares the shorter nested value.
+      Confirm stored enum and shape.
+  yeu_to_nghi_ngo_pv_thuoc.co_khong:
+    type: string
+    values:
+    - Có
+    - Không
+    group: khac
+    form: phan_ve
+    source: docs/01_data_dictionary/phan_ve.md
+    used_by:
+    - R01-PV
+    - R02-PV
+    - R03-PV
+    todo: Parent dictionary includes a note in the positive label; YAML compares the shorter nested value.
+      Confirm stored enum and shape.

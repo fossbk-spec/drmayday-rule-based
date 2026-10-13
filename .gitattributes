@@ -1,0 +1,3 @@
+knowledge/** text eol=lf
+rules/** text eol=lf
+tests/golden/** text eol=lf

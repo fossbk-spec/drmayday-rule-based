@@ -1,0 +1,574 @@
+
+version: "1.2.1"
+module: "all_urticaria_and_anaphylaxis_classification"
+description: "Hệ tri thức Rule-based phân loại chuẩn cho cả 3 bệnh án: Phản vệ, Mày đay cấp và Mày đay mạn (CIndU & CSU)"
+
+rules:
+  # =========================================================================
+  # TẦNG 1: SỐC PHẢN VỆ (Ưu tiên 1 - Cấp cứu tối khẩn)
+  # =========================================================================
+  - rule_id: "R-SOC"
+    name: "Chẩn đoán Sốc phản vệ"
+    target_label: "Sốc phản vệ"
+    priority: 1
+    conditions:
+      all_of:
+        - any_of:
+            - ref_rule: "R02-PV"
+            - ref_rule: "R03-PV"
+        - any_of:
+            # Trẻ 1 tháng - <1 tuổi: HATT < 70 mmHg
+            - all_of:
+                - field: "tuoi"
+                  operator: ">="
+                  value: 0.083
+                - field: "tuoi"
+                  operator: "<"
+                  value: 1
+                - field: "huyet_ap_tam_thu_thap_nhat"
+                  operator: "<"
+                  value: 70
+            # Trẻ 1 - 10 tuổi: HATT < 70 + 2*tuổi mmHg
+            - all_of:
+                - field: "tuoi"
+                  operator: ">="
+                  value: 1
+                - field: "tuoi"
+                  operator: "<="
+                  value: 10
+                - field: "huyet_ap_tam_thu_thap_nhat"
+                  operator: "<_formula"
+                  formula: "70 + 2 * tuoi"
+            # Trẻ 11 - 17 tuổi: HATT < 90 mmHg
+            - all_of:
+                - field: "tuoi"
+                  operator: ">="
+                  value: 11
+                - field: "tuoi"
+                  operator: "<="
+                  value: 17
+                - field: "huyet_ap_tam_thu_thap_nhat"
+                  operator: "<"
+                  value: 90
+            # Người lớn >= 18 tuổi: HATT < 90 mmHg hoặc giảm > 30% so với HA nền
+            - all_of:
+                - field: "tuoi"
+                  operator: ">="
+                  value: 18
+                - any_of:
+                    - field: "huyet_ap_tam_thu_thap_nhat"
+                      operator: "<"
+                      value: 90
+                    - field: "huyet_ap_tam_thu_thap_nhat"
+                      operator: "<_formula"
+                      formula: "0.7 * huyet_ap_tam_thu_nen"
+    decision_trace: "Bệnh nhân thỏa mãn tiêu chuẩn phản vệ kèm tụt huyết áp nghiêm trọng theo độ tuổi hoặc giảm > 30% huyết áp nền."
+
+  # =========================================================================
+  # TẦNG 2: PHẢN VỆ (Ưu tiên 2 - Cấp cứu đe dọa tính mạng)
+  # =========================================================================
+  - rule_id: "R01-PV"
+    name: "Phản vệ - Kịch bản 1 (Không rõ dị nguyên)"
+    target_label: "Phản vệ"
+    priority: 2
+    conditions:
+      all_of:
+        # Không rõ tác nhân dị ứng
+        - field: "yeu_to_nghi_ngo_pv_thuc_an.co_khong"
+          operator: "=="
+          value: "Không"
+        - field: "yeu_to_nghi_ngo_pv_thuoc.co_khong"
+          operator: "=="
+          value: "Không"
+        - field: "yeu_to_nghi_ngo_pv_con_trung_dot.co_khong"
+          operator: "=="
+          value: "Không"
+        - field: "yeu_to_nghi_ngo_pv_khac.co_khong"
+          operator: "=="
+          value: "Không"
+        # Biểu hiện Da / Niêm mạc
+        - field: "trieu_chung_da_hien_tai_pv.danh_sach_chon"
+          operator: "contains_any"
+          value: ["Phù mạch", "Sẩn phù", "Ban dát sẩn"]
+        # Kèm Hô hấp HOẶC Tuần hoàn
+        - any_of:
+            - field: "trieu_chung_ho_hap_hien_tai_pv.danh_sach_chon"
+              operator: "contains_any"
+              value: ["Khó thở", "Thở khò khè", "Khàn giọng", "Tiếng rít thanh quản", "Ngừng thở"]
+            - field: "trieu_chung_tuan_hoan_hien_tai_pv.danh_sach_chon"
+              operator: "contains_any"
+              value: ["Tụt huyết áp / sốc", "Tím tái", "Ngất"]
+    decision_trace: "Xuất hiện triệu chứng Da cấp tính kết hợp suy Hô hấp hoặc Tuần hoàn khi không rõ dị nguyên."
+
+  - rule_id: "R02-PV"
+    name: "Phản vệ - Kịch bản 2 (Dị nguyên nghi ngờ + >= 2/4 hệ cơ quan)"
+    target_label: "Phản vệ"
+    priority: 2
+    conditions:
+      all_of:
+        # Tiếp xúc tác nhân nguy cơ cao
+        - any_of:
+            - field: "yeu_to_nghi_ngo_pv_thuc_an.co_khong"
+              operator: "=="
+              value: "Có"
+            - field: "yeu_to_nghi_ngo_pv_thuoc.co_khong"
+              operator: "=="
+              value: "Có"
+            - field: "yeu_to_nghi_ngo_pv_con_trung_dot.co_khong"
+              operator: "=="
+              value: "Có"
+            - field: "yeu_to_nghi_ngo_pv_khac.co_khong"
+              operator: "=="
+              value: "Có"
+        # Đạt >= 2 trong 4 hệ thống cơ quan
+        - operator: "count_matching_systems_gte"
+          min_count: 2
+          systems:
+            da_niem_mac:
+              field: "trieu_chung_da_hien_tai_pv.danh_sach_chon"
+              operator: "contains_any"
+              value: ["Phù mạch", "Sẩn phù", "Ban dát sẩn"]
+            ho_hap:
+              field: "trieu_chung_ho_hap_hien_tai_pv.danh_sach_chon"
+              operator: "contains_any"
+              value: ["Khó thở", "Thở khò khè", "Khàn giọng", "Tiếng rít thanh quản", "Ngừng thở"]
+            tuan_hoan:
+              field: "trieu_chung_tuan_hoan_hien_tai_pv.danh_sach_chon"
+              operator: "contains_any"
+              value: ["Tụt huyết áp / sốc", "Ngất"]
+            tieu_hoa_nang:
+              any_of:
+                - field: "trieu_chung_tieu_hoa_hien_tai_pv.dau_bung_quan_that"
+                  operator: "=="
+                  value: true
+                - field: "trieu_chung_tieu_hoa_hien_tai_pv.non_so_lan"
+                  operator: ">="
+                  value: 2
+    decision_trace: "Tiếp xúc dị nguyên nguy cơ cao kèm tổn thương đồng thời từ 2 hệ cơ quan trở lên."
+
+  - rule_id: "R03-PV"
+    name: "Phản vệ - Kịch bản 3 (Dị nguyên đã biết + Tụt HA hoặc Hô hấp ngoài đường hít)"
+    target_label: "Phản vệ"
+    priority: 2
+    conditions:
+      all_of:
+        - any_of:
+            - field: "yeu_to_nghi_ngo_pv_thuc_an.co_khong"
+              operator: "=="
+              value: "Có"
+            - field: "yeu_to_nghi_ngo_pv_thuoc.co_khong"
+              operator: "=="
+              value: "Có"
+            - field: "yeu_to_nghi_ngo_pv_con_trung_dot.co_khong"
+              operator: "=="
+              value: "Có"
+            - field: "yeu_to_nghi_ngo_pv_khac.co_khong"
+              operator: "=="
+              value: "Có"
+        - any_of:
+            - all_of:
+                - field: "tac_nhan_hit_vao_pv"
+                  operator: "=="
+                  value: "Không"
+                - field: "trieu_chung_ho_hap_hien_tai_pv.danh_sach_chon"
+                  operator: "contains_any"
+                  value: ["Khó thở", "Thở khò khè", "Khàn giọng", "Tiếng rít thanh quản", "Ngừng thở"]
+            - field: "trieu_chung_tuan_hoan_hien_tai_pv.danh_sach_chon"
+              operator: "contains_any"
+              value: ["Tụt huyết áp / sốc", "Ngất"]
+    decision_trace: "Tiếp xúc dị nguyên đã biết kèm suy hô hấp (dị nguyên không qua đường hít) hoặc suy tuần hoàn."
+
+  - rule_id: "R-PV-THEODOI"
+    name: "Theo dõi sát phản vệ"
+    target_label: "Theo dõi phản vệ (Chưa đủ dữ kiện)"
+    target_status: "INSUFFICIENT_DATA"
+    priority: 3
+    conditions:
+      any_of:
+        - field: "tiep_tuc_theo_doi_chua_du_du_kien"
+          operator: "=="
+          value: true
+    decision_trace: "Bác sĩ đánh dấu cờ chưa đủ dữ kiện phân loại tại thời điểm đánh giá ban đầu."
+
+  # =========================================================================
+  # TẦNG 3: MÀY ĐAY CẤP TÍNH (< 6 TUẦN)
+  # =========================================================================
+  - rule_id: "R-SANGLOC-CAP"
+    name: "Điều kiện tiên quyết Mày đay cấp"
+    is_base_condition: true
+    conditions:
+      all_of:
+        - field: "hien_tai_co_san_phu"
+          operator: "=="
+          value: "Có"
+        - field: "dac_diem_san_phu_cap.dang_ton_thuong"
+          operator: "contains_any"
+          value: ["Hình vòng (bờ rõ)", "Hình tròn (bờ rõ)", "Hình bản đồ (bờ rõ)"]
+        - field: "anh_san_phu"
+          operator: "=="
+          value: "Có"
+        - field: "thoi_gian_khoi_phat_gio"
+          operator: "<="
+          value: 1008
+
+  - rule_id: "R01-CAP-NANG"
+    name: "Mày đay cấp có dấu hiệu nặng"
+    target_label: "Mày đay cấp có dấu hiệu nặng"
+    priority: 4
+    conditions:
+      all_of:
+        - ref_rule: "R-SANGLOC-CAP"
+        - any_of:
+            # Tiêu chí 1: Phù mạch đáng kể
+            - field: "trieu_chung_da_hien_tai"
+              operator: "=="
+              value: "Phù mạch đáng kể"
+            - field: "so_lan_phu_mach_nang_can_vien"
+              operator: ">="
+              value: 1
+            - field: "vi_tri_phu_mach.danh_sach_chon"
+              operator: "contains_any"
+              value: ["Mi mắt", "Lưỡi", "Thanh quản", "Môi"]
+            - field: "dau_hieu_nang_chi_tiet"
+              operator: "contains"
+              value: "Phù mạch đáng kể"
+            # Tiêu chí 2: Ngứa nhiều
+            - field: "trieu_chung_da_hien_tai"
+              operator: "=="
+              value: "Ngứa nhiều"
+            # Tiêu chí 3: Sẩn phù lan rộng > 50% BSA hoặc > 50 nốt
+            - field: "muc_do_lan_rong_va_phan_bo_ton_thuong.muc_do_lan_rong"
+              operator: "=="
+              value: ">50% BSA"
+            - field: "so_luong_san_phu"
+              operator: "=="
+              value: ">50 nốt"
+            # Tiêu chí 4: Triệu chứng tiêu hóa đi kèm
+            - field: "trieu_chung_tieu_hoa_hien_tai.non"
+              operator: "=="
+              value: true
+            - field: "trieu_chung_tieu_hoa_hien_tai.dau_bung_quan_that"
+              operator: "=="
+              value: true
+            - field: "trieu_chung_tieu_hoa_hien_tai.buon_non_tieu_chay"
+              operator: "=="
+              value: true
+            # Tiêu chí 5: Triệu chứng hô hấp nhẹ/vừa
+            - field: "trieu_chung_ho_hap_hien_tai.danh_sach_chon"
+              operator: "contains_any"
+              value: ["Thở khò khè", "Nghẹn họng"]
+    decision_trace: "Mày đay cấp < 6 tuần kèm theo ít nhất 1 dấu hiệu cảnh báo nặng (phù mạch mặt/họng, ngứa dữ dội, lan rộng >50% BSA hoặc triệu chứng cơ quan khác)."
+
+  - rule_id: "R01-CAP-THUONG"
+    name: "Mày đay cấp thông thường"
+    target_label: "Mày đay cấp thông thường"
+    priority: 5
+    conditions:
+      all_of:
+        - ref_rule: "R-SANGLOC-CAP"
+        - field: "trieu_chung_da_hien_tai.danh_sach_chon"
+          operator: "contains"
+          value: "Sẩn phù"
+        # Phủ định tất cả tiêu chí nặng
+        - not:
+            any_of:
+              - field: "trieu_chung_da_hien_tai"
+                operator: "=="
+                value: "Phù mạch đáng kể"
+              - field: "trieu_chung_da_hien_tai"
+                operator: "=="
+                value: "Ngứa nhiều"
+              - field: "so_lan_phu_mach_nang_can_vien"
+                operator: ">="
+                value: 1
+              - field: "vi_tri_phu_mach.danh_sach_chon"
+                operator: "contains_any"
+                value: ["Mi mắt", "Lưỡi", "Thanh quản", "Môi"]
+              - field: "muc_do_lan_rong_va_phan_bo_ton_thuong.muc_do_lan_rong"
+                operator: "=="
+                value: ">50% BSA"
+              - field: "so_luong_san_phu"
+                operator: "=="
+                value: ">50 nốt"
+              - field: "trieu_chung_tieu_hoa_hien_tai.non"
+                operator: "=="
+                value: true
+              - field: "trieu_chung_tieu_hoa_hien_tai.dau_bung_quan_that"
+                operator: "=="
+                value: true
+              - field: "trieu_chung_tieu_hoa_hien_tai.buon_non_tieu_chay"
+                operator: "=="
+                value: true
+              - field: "trieu_chung_ho_hap_hien_tai.danh_sach_chon"
+                operator: "contains_any"
+                value: ["Thở khò khè", "Nghẹn họng"]
+    decision_trace: "Sẩn phù cấp tính thoáng qua < 6 tuần, không kèm phù mạch nguy hiểm hay triệu chứng toàn thân."
+
+  # =========================================================================
+  # TẦNG 4: MÀY ĐAY CẢM ỨNG MẠN TÍNH (CIndU - CHRONIC INDUCIBLE URTICARIA)
+  # =========================================================================
+  - rule_id: "R-CindU-00"
+    name: "Điều kiện tiên quyết CIndU"
+    is_base_condition: true
+    conditions:
+      all_of:
+        - field: "thoi_gian_khoi_phat_tuan"
+          operator: ">"
+          value: 6
+        - field: "hoan_canh_xuat_hien_san_phu"
+          operator: "contains"
+          value: "Khi có các yếu tố kích thích"
+
+  - rule_id: "R-CindU-01"
+    name: "Mày đay CIndU da vẽ nổi"
+    target_label: "Mày đay CindU da vẽ nổi"
+    priority: 6
+    conditions:
+      all_of:
+        - ref_rule: "R-CindU-00"
+        - field: "da_ve_noi_ket_qua"
+          operator: "=="
+          value: "(+)"
+    decision_trace: "Mày đay mạn tính > 6 tuần xuất hiện khi có kích thích cơ học và FricTest dương tính."
+
+  - rule_id: "R-CindU-02"
+    name: "Mày đay CIndU Cholinergic"
+    target_label: "Mày đay CindU Choline (do nóng)"
+    priority: 6
+    conditions:
+      all_of:
+        - ref_rule: "R-CindU-00"
+        - field: "cholinergic_ket_qua"
+          operator: "=="
+          value: "(+)"
+    decision_trace: "Mày đay mạn tính xuất hiện khi nóng bức, gắng sức, ra mồ hôi và test kích thích Cholinergic dương tính."
+
+  - rule_id: "R-CindU-03"
+    name: "Mày đay CIndU do lạnh"
+    target_label: "Mày đay CindU do lạnh"
+    priority: 6
+    conditions:
+      all_of:
+        - ref_rule: "R-CindU-00"
+        - any_of:
+            - field: "lanh_temptest_ket_qua"
+              operator: "=="
+              value: "(+)"
+            - field: "lanh_cucda_ket_qua"
+              operator: "=="
+              value: "(+)"
+    decision_trace: "Mày đay mạn tính xuất hiện khi tiếp xúc nhiệt độ lạnh và test lạnh (TempTest / Ice cube) dương tính."
+
+  - rule_id: "R-CindU-04"
+    name: "Mày đay CIndU khác"
+    target_label: "Mày đay CindU khác"
+    priority: 6
+    conditions:
+      all_of:
+        - ref_rule: "R-CindU-00"
+        - field: "da_ve_noi_ket_qua"
+          operator: "!="
+          value: "(+)"
+        - field: "cholinergic_ket_qua"
+          operator: "!="
+          value: "(+)"
+        - field: "lanh_temptest_ket_qua"
+          operator: "!="
+          value: "(+)"
+        - any_of:
+            - field: "ap_luc_cham_ket_qua"
+              operator: "=="
+              value: "(+)"
+            - field: "anh_sang_ket_qua"
+              operator: "=="
+              value: "(+)"
+            - field: "nuoc_ket_qua"
+              operator: "=="
+              value: "(+)"
+            - field: "khac_ket_qua"
+              operator: "=="
+              value: "(+)"
+    decision_trace: "Mày đay cảm ứng mạn tính do yếu tố kích thích đặc thù khác (áp lực chậm, ánh sáng mặt trời, nước hoặc rung chấn)."
+
+  # =========================================================================
+  # TẦNG 5: MÀY ĐAY TỰ PHÁT MẠN TÍNH (CSU - CHRONIC SPONTANEOUS URTICARIA)
+  # =========================================================================
+  - rule_id: "R-CSU-00"
+    name: "Điều kiện tiên quyết CSU"
+    is_base_condition: true
+    conditions:
+      all_of:
+        - field: "thoi_gian_khoi_phat_tuan"
+          operator: ">"
+          value: 6
+        - field: "tuoi"
+          operator: ">="
+          value: 16
+        - field: "luu_huyet_thanh"
+          operator: "=="
+          value: "Có"
+        - field: "thoi_gian_ngung_khang_histamine_asst"
+          operator: ">="
+          value: 8
+        - field: "thoi_gian_ngung_corticoid_asst"
+          operator: ">="
+          value: 30
+
+  # Phân chia Giai đoạn 1 (ASST +) và Giai đoạn 2 (ASST -)
+  - rule_id: "R-GD-01"
+    name: "CSU Giai đoạn 1 (ASST dương tính)"
+    is_base_condition: true
+    conditions:
+      all_of:
+        - ref_rule: "R-CSU-00"
+        - field: "asst_ket_qua"
+          operator: "=="
+          value: "(+)"
+
+  - rule_id: "R-GD-02"
+    name: "CSU Giai đoạn 2 (ASST âm tính, đạt chuẩn Stella)"
+    is_base_condition: true
+    conditions:
+      all_of:
+        - ref_rule: "R-CSU-00"
+        - field: "asst_ket_qua"
+          operator: "=="
+          value: "(−)"
+        - any_of:
+            - field: "stella_dat"
+              operator: "=="
+              value: true
+            - field: "ige_toan_phan"
+              operator: "<"
+              value: 40
+
+  # --- Cây phân loại thể bệnh ELISA ---
+  - rule_id: "R-CSU-T1-01"
+    name: "Mày đay CSU Type I (Giai đoạn 1)"
+    target_label: "Mày đay CSU type 1"
+    priority: 7
+    conditions:
+      all_of:
+        - ref_rule: "R-GD-01"
+        - field: "so_ngay_theo_doi"
+          operator: ">="
+          value: 60
+        - field: "igg_khang_fceria_ket_qua"
+          operator: "=="
+          value: "(−)"
+        - field: "igg_khang_ige_ket_qua"
+          operator: "=="
+          value: "(−)"
+        - field: "ige_khang_il24_ket_qua"
+          operator: "=="
+          value: "(+)"
+    decision_trace: "CSU GĐ1 (ASST +) theo dõi >= 60 ngày: IgG kháng FcεRIα/IgE âm tính, IgE kháng IL-24 dương tính (Autoallergic Endotype)."
+
+  - rule_id: "R-CSU-T1-02"
+    name: "Mày đay CSU Type I (Giai đoạn 2)"
+    target_label: "Mày đay CSU type 1"
+    priority: 7
+    conditions:
+      all_of:
+        - ref_rule: "R-GD-02"
+        - field: "ige_khang_il24_ket_qua"
+          operator: "=="
+          value: "(+)"
+    decision_trace: "CSU GĐ2 (ASST − đạt chuẩn Stella): Kháng thể IgE kháng IL-24 dương tính (Autoallergic Endotype)."
+
+  - rule_id: "R-CSU-T2-01"
+    name: "Mày đay CSU Type IIb (Tự miễn)"
+    target_label: "Mày đay CSU type 2"
+    priority: 7
+    conditions:
+      all_of:
+        - ref_rule: "R-GD-01"
+        - field: "so_ngay_theo_doi"
+          operator: ">="
+          value: 60
+        - any_of:
+            - field: "igg_khang_fceria_ket_qua"
+              operator: "=="
+              value: "(+)"
+            - field: "igg_khang_ige_ket_qua"
+              operator: "=="
+              value: "(+)"
+        - field: "ige_khang_il24_ket_qua"
+          operator: "=="
+          value: "(−)"
+    decision_trace: "CSU GĐ1 (ASST +) theo dõi >= 60 ngày: Tự kháng thể IgG dương tính và IgE kháng IL-24 âm tính (Autoimmune Endotype)."
+
+  - rule_id: "R-CSU-OVL-01"
+    name: "Mày đay CSU Chồng lấp (Overlap)"
+    target_label: "Mày đay CSU overlap"
+    priority: 7
+    conditions:
+      all_of:
+        - ref_rule: "R-GD-01"
+        - field: "so_ngay_theo_doi"
+          operator: ">="
+          value: 60
+        - any_of:
+            - field: "igg_khang_fceria_ket_qua"
+              operator: "=="
+              value: "(+)"
+            - field: "igg_khang_ige_ket_qua"
+              operator: "=="
+              value: "(+)"
+        - field: "ige_khang_il24_ket_qua"
+          operator: "=="
+          value: "(+)"
+    decision_trace: "CSU GĐ1 (ASST +) theo dõi >= 60 ngày: Đồng thời dương tính với cả tự kháng thể IgG và IgE kháng IL-24."
+
+  - rule_id: "R-CSU-UNK-01"
+    name: "Mày đay CSU Không xác định (Giai đoạn 1)"
+    target_label: "Mày đay CSU unknown"
+    priority: 7
+    conditions:
+      all_of:
+        - ref_rule: "R-GD-01"
+        - field: "so_ngay_theo_doi"
+          operator: ">="
+          value: 60
+        - field: "igg_khang_fceria_ket_qua"
+          operator: "=="
+          value: "(−)"
+        - field: "igg_khang_ige_ket_qua"
+          operator: "=="
+          value: "(−)"
+        - field: "ige_khang_il24_ket_qua"
+          operator: "=="
+          value: "(−)"
+    decision_trace: "CSU GĐ1 điểm dừng: Cả tự kháng thể IgG và IgE kháng IL-24 đều âm tính."
+
+  - rule_id: "R-CSU-UNK-02"
+    name: "Mày đay CSU Không xác định (Giai đoạn 2)"
+    target_label: "Mày đay CSU unknown"
+    priority: 7
+    conditions:
+      all_of:
+        - ref_rule: "R-GD-02"
+        - field: "ige_khang_il24_ket_qua"
+          operator: "=="
+          value: "(−)"
+    decision_trace: "CSU GĐ2 điểm dừng: Test ASST âm tính và IgE kháng IL-24 âm tính."
+
+  # =========================================================================
+  # TẦNG 6: MẶC ĐỊNH / CHƯA ĐỦ DỮ LIỆU ĐỂ PHÂN LOẠI
+  # =========================================================================
+  - rule_id: "R-DEFAULT"
+    name: "Chưa đủ dữ liệu phân loại, tiếp tục theo dõi"
+    target_label: "Chưa phân loại (Tiếp tục theo dõi)"
+    target_status: "INSUFFICIENT_DATA"
+    priority: 8
+    conditions:
+      any_of:
+        - field: "asst_ket_qua"
+          operator: "=="
+          value: null
+        - all_of:
+            - ref_rule: "R-GD-01"
+            - field: "so_ngay_theo_doi"
+              operator: "<"
+              value: 60
+    decision_trace: "Dữ liệu chưa đủ điều kiện phân type chuyên sâu (thiếu kết quả ASST, chưa đủ 60 ngày theo dõi hoặc thiếu kết quả ELISA)."

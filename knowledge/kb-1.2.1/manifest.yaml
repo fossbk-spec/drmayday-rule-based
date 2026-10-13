@@ -1,0 +1,12 @@
+knowledge_package_id: kb-1.2.1
+package_version: 1.2.1
+fields_version: 0.1.0
+supported_engine_versions:
+- 1.1.0
+previous_package_id: null
+released_at: '2026-10-13'
+change_summary: 'Gói đầu tiên: đóng gói YAML 1.2.1 hiện có; chưa qua duyệt chuyên
+  môn.'
+files:
+  classification_rules.yaml: sha256:aff477a8d5e698ed8c03559272c67a9f1e747fe77f693148e469257624dd9ff6
+  fields.yaml: sha256:4f46bbaf306aee618683510b660d18317b93a4215f7c01b64e0db62878f8df83
