@@ -16,6 +16,17 @@ Review: <họ tên, ngày, kết luận khi đã xác nhận>
 
 Không sửa ngày hoặc gán tên cho các lần thay đổi không có bằng chứng. Các phần hướng dẫn phía dưới được cập nhật cùng giao diện; kết quả kiểm tra của từng mục nhật ký vẫn giữ theo thời điểm đã chạy.
 
+## Nhật ký — 14/10/2026 (sửa dữ liệu giả lập)
+
+- **Người sửa đổi:** Claude Code (AI), theo yêu cầu của người dùng.
+- **Vấn đề:** pipeline (Bước 3) phát hiện dữ liệu giả dùng giá trị ngoài từ điển, trái quy tắc "chỉ dùng giá trị hợp lệ theo bảng biến".
+- **Thay đổi:**
+  - `data/synthetic/rule_logic_cases.json` — 136 ca: `so_luong_san_phu` `"<50 nốt"` → `"<20 nốt"` (từ điển chỉ có `<20 nốt` / `20-50 nốt` / `>50 nốt`). Luật chỉ so với `">50 nốt"` nên kết quả engine và golden không đổi.
+  - `data/synthetic/12_benh_an_CSU.json` — 31 giá trị xét nghiệm dùng gạch ASCII `"(-)"` → dấu trừ `"(−)"` theo từ điển (ASST, phân loại ASST, IgG anti-IgE, IgG anti-FcεRIα, IgE anti-IL-24).
+- **Giữ nguyên có chủ đích:** 5 ca `SOC-INVALID-*`/`SOC-MISSING-80` (F-12), `CINDU-NONENUM` và `CSU-ASST-(-)` (F-07) – các ca kiểm thử dữ liệu sai.
+- **Kết quả pipeline (191 record):** `INVALID_DATA` 147 → 7 (đúng 7 ca cố ý sai); CLASSIFIED 1 → 91. 53 ca cũ có nhãn: accuracy vẫn 0/53 vì hồ sơ cũ là RAW, thiếu trường/khác cấu trúc CANONICAL (ví dụ 12 ca CSU thiếu trường sàng lọc phản vệ → `INSUFFICIENT_DATA`, F-09) – cần mapping D-01, không tự điền.
+- **Kiểm tra:** 52/52 test đạt; golden không đổi.
+
 ## Nhật ký — 13/10/2026 (Bước 0 – nền móng)
 
 - **Người sửa đổi:** Claude Code (AI), theo yêu cầu của người dùng; review bởi Codex (read-only) ở commit `da018a8`, chưa có người review.
