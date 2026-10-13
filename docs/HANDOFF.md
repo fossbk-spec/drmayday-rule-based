@@ -72,7 +72,7 @@ $env:PYTHONDONTWRITEBYTECODE = "1"
 .\.venv\Scripts\python.exe -m streamlit run main.py                    # demo local
 ```
 
-- **Codex trên Windows:** sandbox của Codex không đọc được Python trong `%LOCALAPPDATA%`. Tạo `.venv` từ một bản Python nằm trong thư mục sandbox đọc được, ví dụ copy thư mục cài Python vào `C:\<workspace>\.tools\python314` rồi `C:\<workspace>\.tools\python314\python.exe -m venv .venv`. Kiểm tra: `codex exec -s read-only` chạy lệnh test trả `OK`.
+- **Codex trên Windows:** sandbox của Codex không đọc được Python trong `%LOCALAPPDATA%`; `tools\setup_machine.ps1 -ForCodex` tự copy Python vào `..\.tools\` và tạo `.venv` từ đó (làm tay: copy thư mục cài Python vào thư mục sandbox đọc được rồi `<bản copy>\python.exe -m venv .venv`). Kiểm tra: `codex exec -s read-only` chạy lệnh test trả `OK`.
 - Chạy Codex: `codex exec -m <model> -c model_reasoning_effort=medium -C <repo> -s workspace-write -o <report.md> - < prompt.txt`. Sandbox không ghi được `.git` → Claude commit.
 - Python có ký tự tiếng Việt trên console Windows: thêm `-X utf8`.
 - Working tree Windows dùng CRLF; `.gitattributes` buộc LF cho `knowledge/`, `rules/`, `tests/golden/`; hash gói tính trên bytes đã chuẩn hóa LF.
