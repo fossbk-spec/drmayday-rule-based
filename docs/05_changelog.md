@@ -16,6 +16,12 @@ Review: <họ tên, ngày, kết luận khi đã xác nhận>
 
 Không sửa ngày hoặc gán tên cho các lần thay đổi không có bằng chứng. Các phần hướng dẫn phía dưới được cập nhật cùng giao diện; kết quả kiểm tra của từng mục nhật ký vẫn giữ theo thời điểm đã chạy.
 
+## Nhật ký — 13/11/2026 (tài liệu quyết định cho bác sĩ)
+
+- **Thay đổi:** thêm `docs/08_quyet_dinh_bac_si.md` — 16 câu hỏi chuyên môn còn mở (F-01..F-13, D-01..D-11, `R-PV-THEODOI` lệch tài liệu, chính sách `extract_min_sbp`, 24 trường `todo` của `fields.yaml`) gom cho một buổi review, mỗi câu kèm ca giả trong `rule_logic_cases.json` và kết quả engine hiện tại. Cập nhật `docs/HANDOFF.md` mục 2.
+- **Kiểm tra:** chạy lại 25 ca minh họa trên `kb-1.2.1`/engine `1.1.0` để lấy trạng thái ghi trong mục 7 của tài liệu; không sửa code, luật, dữ liệu hay golden.
+- **Còn mở:** toàn bộ 16 câu chờ bác sĩ/chủ dữ liệu; engine giữ nguyên hành vi.
+
 ## Nhật ký — 14/10/2026 (sửa dữ liệu giả lập)
 
 - **Người sửa đổi:** Claude Code (AI), theo yêu cầu của người dùng.

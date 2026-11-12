@@ -45,12 +45,12 @@ Số liệu hiện tại: 52 test pass; CI Python 3.9 + 3.12; pipeline trên 191
 
 **Người dùng / bác sĩ:**
 1. Deploy demo lên Streamlit Community Cloud (repo `fossbk-spec/drmayday-rule-based`, nhánh `main`, file `main.py`) – cần tài khoản người dùng.
-2. Buổi review với bác sĩ: 24 mục `todo` trong `rules/fields.yaml`; F-01 (shape triệu chứng cấp, nhánh cấp thường); `R-PV-THEODOI` lệch `docs/01_rules.md`; ngưỡng F-02..F-11; quyết định D-01..D-11 ([09](implementation-guide/09-decisions-and-templates.md)).
+2. Buổi review với bác sĩ theo [08 — danh sách quyết định](08_quyet_dinh_bac_si.md) (16 câu Q1–Q16, mỗi câu có ca giả minh họa và ô ghi quyết định): gồm 24 mục `todo` trong `rules/fields.yaml`, F-01 (shape triệu chứng cấp, nhánh cấp thường), `R-PV-THEODOI` lệch `docs/01_rules.md`, ngưỡng F-02..F-11, quyết định D-01..D-11 ([09](implementation-guide/09-decisions-and-templates.md)). Kết quả ghi vào `docs/decisions/D-XX.md` rồi mở brief `B6-kb-1.3.0`.
 3. Chốt D-07 (dữ liệu thật: ai truy cập, có lưu không) và nơi host khu dữ liệu thật → mở Bước 5.
 
 **Kỹ thuật làm được ngay (không chờ quyết định):**
-- Soạn tài liệu "danh sách quyết định cho bác sĩ" kèm ca minh họa giả (đã đề xuất, chưa làm).
-- `extract_min_sbp` khi có cả giá trị sẵn và bảng sinh hiệu – cần người dùng chọn chính sách trước.
+- ~~Soạn tài liệu "danh sách quyết định cho bác sĩ" kèm ca minh họa giả~~ — xong 13/11/2026: [docs/08_quyet_dinh_bac_si.md](08_quyet_dinh_bac_si.md).
+- `extract_min_sbp` khi có cả giá trị sẵn và bảng sinh hiệu – đã đưa thành Q5 trong 08; chờ chọn chính sách.
 - Allowlist trường xuất + PII lồng nhau/ghi chú trong `src/anonymize.py` – cần D-07.
 
 ## 3. Cách làm việc đã thống nhất
