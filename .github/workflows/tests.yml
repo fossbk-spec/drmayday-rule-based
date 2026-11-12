@@ -9,7 +9,8 @@ permissions:
 
 jobs:
   unittest:
-    runs-on: ubuntu-latest
+    # ubuntu-latest (26.04) no longer ships a Python 3.9 build for setup-python; pin 24.04.
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
